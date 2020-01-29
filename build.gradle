@@ -1,6 +1,8 @@
 plugins {
-	id 'java-gradle-plugin'
-	id 'maven-publish'
+	id "checkstyle"
+	id "io.spring.javaformat" version "$javaFormatVersion"
+	id "java-gradle-plugin"
+	id "maven-publish"
 }
 
 repositories {
@@ -11,7 +13,14 @@ repositories {
 group = 'io.spring.gradle'
 
 dependencies {
+	checkstyle("io.spring.javaformat:spring-javaformat-checkstyle:${javaFormatVersion}")
 	compileOnly("com.gradle.enterprise:com.gradle.enterprise.gradle.plugin:3.1.1")
+}
+
+checkstyle {
+	def archive = configurations.checkstyle.filter { it.name.startsWith("spring-javaformat-checkstyle")}
+	config = resources.text.fromArchiveEntry(archive, "io/spring/javaformat/checkstyle/checkstyle.xml")
+	toolVersion = 8.28
 }
 
 gradlePlugin {
