@@ -1,0 +1,24 @@
+plugins {
+	id 'java-gradle-plugin'
+	id 'maven-publish'
+}
+
+repositories {
+	mavenCentral()
+	gradlePluginPortal()
+}
+
+group = 'io.spring.gradle'
+
+dependencies {
+	compileOnly("com.gradle.enterprise:com.gradle.enterprise.gradle.plugin:3.1.1")
+}
+
+gradlePlugin {
+	plugins {
+		gradleEnterprisePlugin {
+			id = 'io.spring.ge'
+			implementationClass = 'io.spring.ge.GradleEnterprisePlugin'
+		}
+	}
+}
