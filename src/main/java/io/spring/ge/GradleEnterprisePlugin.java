@@ -16,9 +16,13 @@
 
 package io.spring.ge;
 
+import javax.inject.Inject;
+
 import com.gradle.enterprise.gradleplugin.GradleEnterpriseExtension;
 import org.gradle.api.Plugin;
 import org.gradle.api.initialization.Settings;
+import org.gradle.api.internal.ProcessOperations;
+import org.gradle.process.ExecOperations;
 
 /**
  * {@link Settings} {@link Plugin plugin} for configuring the use of Gradle Enterprise
@@ -28,11 +32,18 @@ import org.gradle.api.initialization.Settings;
  */
 public class GradleEnterprisePlugin implements Plugin<Settings> {
 
+	private final ExecOperations execOperations;
+
+	@Inject
+	public GradleEnterprisePlugin(ProcessOperations processOperations) {
+		this.execOperations = new ProcessOperationsExecOperations(processOperations);
+	}
+
 	@Override
 	public void apply(Settings settings) {
 		settings.getPlugins().withType(com.gradle.enterprise.gradleplugin.GradleEnterprisePlugin.class, (plugin) -> {
 			GradleEnterpriseExtension extension = settings.getExtensions().getByType(GradleEnterpriseExtension.class);
-			extension.buildScan(new BuildScanConfigurer());
+			extension.buildScan(new BuildScanConfigurer(this.execOperations));
 		});
 	}
 

@@ -16,19 +16,33 @@
 
 package io.spring.ge;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import com.gradle.scan.plugin.BuildScanExtension;
 import org.gradle.api.Action;
 import org.gradle.api.GradleException;
+import org.gradle.process.ExecOperations;
 
 /**
- * {@link Action} that configures build scans publishing to Gradle Enterprise hosted at
+ * {@link Action} that configures a build scan to publish to Gradle Enterprise hosted at
  * <a href="https://ge.spring.io">ge.spring.io</a>.
  *
  * @author Andy Wilkinson
  */
 class BuildScanConfigurer implements Action<BuildScanExtension> {
+
+	private static final String BAMBOO_RESULTS_ENV_VAR = "bamboo_resultsUrl";
+
+	private final ExecOperations execOperations;
+
+	BuildScanConfigurer(ExecOperations execOperations) {
+		this.execOperations = execOperations;
+	}
 
 	@Override
 	public void execute(BuildScanExtension buildScan) {
@@ -43,6 +57,112 @@ class BuildScanConfigurer implements Action<BuildScanExtension> {
 			throw new GradleException("Failed to enable publishIfAuthenticated", ex);
 		}
 		buildScan.setServer("https://ge.spring.io");
+		tagBuildScan(buildScan);
+		buildScan.background(this::addGitMetadata);
+		addCiMetadata(buildScan);
+	}
+
+	private void tagBuildScan(BuildScanExtension buildScan) {
+		tagCiOrLocal(buildScan);
+		tagJdk(buildScan);
+		tagOperatingSystem(buildScan);
+	}
+
+	private void tagCiOrLocal(BuildScanExtension buildScan) {
+		buildScan.tag(isCi() ? "CI" : "Local");
+	}
+
+	private boolean isCi() {
+		if (isBamboo() || isConcourse()) {
+			return true;
+		}
+		return false;
+	}
+
+	private boolean isBamboo() {
+		return System.getenv().containsKey(BAMBOO_RESULTS_ENV_VAR);
+	}
+
+	private boolean isConcourse() {
+		return System.getenv().containsKey("CI");
+	}
+
+	private void tagJdk(BuildScanExtension buildScan) {
+		buildScan.tag("JDK-" + System.getProperty("java.specification.version"));
+	}
+
+	private void tagOperatingSystem(BuildScanExtension buildScan) {
+		buildScan.tag(System.getProperty("os.name"));
+	}
+
+	private void addGitMetadata(BuildScanExtension buildScan) {
+		exec("git", "rev-parse", "--short=8", "--verify", "HEAD").standardOut((gitCommitId) -> {
+			String commitIdLabel = "Git Commit ID";
+			buildScan.value(commitIdLabel, gitCommitId);
+			buildScan.link("Git commit build scans",
+					buildScan.getServer() + createSearchUrl(commitIdLabel, gitCommitId));
+		});
+		getBranch().standardOut((gitBranchName) -> {
+			buildScan.tag(gitBranchName);
+			buildScan.value("Git branch", gitBranchName);
+		});
+		exec("git", "status", "--porcelain").standardOut((gitStatus) -> {
+			buildScan.tag("dirty");
+			buildScan.value("Git status", gitStatus);
+		});
+	}
+
+	private void addCiMetadata(BuildScanExtension buildScan) {
+		if (isBamboo()) {
+			buildScan.link("CI build", System.getenv(BAMBOO_RESULTS_ENV_VAR));
+		}
+	}
+
+	private ExecResult getBranch() {
+		String branch = System.getenv("BRANCH");
+		if (branch != null) {
+			return new ExecResult(branch);
+		}
+		return exec("git", "rev-parse", "--abbrev-ref", "HEAD");
+	}
+
+	private String createSearchUrl(String name, String value) {
+		return "/scans?search.names=" + encodeURL(name) + "&search.values=" + encodeURL(value);
+	}
+
+	private String encodeURL(String url) {
+		try {
+			return URLEncoder.encode(url, "UTF-8");
+		}
+		catch (UnsupportedEncodingException ex) {
+			throw new RuntimeException(ex);
+		}
+	}
+
+	private ExecResult exec(Object... commandLine) {
+		ByteArrayOutputStream standardOutput = new ByteArrayOutputStream();
+		this.execOperations.exec((spec) -> {
+			spec.setCommandLine(commandLine);
+			spec.setStandardOutput(standardOutput);
+			spec.setWorkingDir(new File(".").getAbsolutePath());
+		});
+		return new ExecResult(standardOutput.toString().trim());
+	}
+
+	private static final class ExecResult {
+
+		private final String standardOutput;
+
+		private ExecResult(String standardOutput) {
+			this.standardOutput = standardOutput;
+		}
+
+		private void standardOut(Consumer<String> consumer) {
+			if (this.standardOutput.length() > 0) {
+				consumer.accept(this.standardOutput);
+			}
+		}
+
 	}
 
 }
