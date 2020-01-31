@@ -30,7 +30,8 @@ import org.gradle.api.GradleException;
 import org.gradle.process.ExecOperations;
 
 /**
- * {@link Action} that configures the build scan with several Spring conventions.
+ * {@link Action} that configures the {@link BuildScanExtension build scan} with Spring
+ * conventions.
  *
  * @author Andy Wilkinson
  */
