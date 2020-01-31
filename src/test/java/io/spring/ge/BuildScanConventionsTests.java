@@ -163,7 +163,7 @@ class BuildScanConventionsTests {
 		assertThat(this.buildScan.values).containsEntry("Git status", "M build.gradle");
 	}
 
-	static final class TestBuildScanExtension implements BuildScanExtension {
+	public static final class TestBuildScanExtension implements BuildScanExtension {
 
 		private final TestBuildScanDataObfuscation obfuscation = new TestBuildScanDataObfuscation();
 
