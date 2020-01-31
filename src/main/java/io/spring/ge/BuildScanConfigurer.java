@@ -20,6 +20,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.Map;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -38,10 +39,17 @@ class BuildScanConfigurer implements Action<BuildScanExtension> {
 
 	private static final String BAMBOO_RESULTS_ENV_VAR = "bamboo_resultsUrl";
 
+	private final Map<String, String> env;
+
 	private final ExecOperations execOperations;
 
 	BuildScanConfigurer(ExecOperations execOperations) {
+		this(execOperations, System.getenv());
+	}
+
+	BuildScanConfigurer(ExecOperations execOperations, Map<String, String> env) {
 		this.execOperations = execOperations;
+		this.env = env;
 	}
 
 	@Override
@@ -80,11 +88,11 @@ class BuildScanConfigurer implements Action<BuildScanExtension> {
 	}
 
 	private boolean isBamboo() {
-		return System.getenv().containsKey(BAMBOO_RESULTS_ENV_VAR);
+		return this.env.containsKey(BAMBOO_RESULTS_ENV_VAR);
 	}
 
 	private boolean isConcourse() {
-		return System.getenv().containsKey("CI");
+		return this.env.containsKey("CI");
 	}
 
 	private void tagJdk(BuildScanExtension buildScan) {
@@ -97,7 +105,7 @@ class BuildScanConfigurer implements Action<BuildScanExtension> {
 
 	private void addGitMetadata(BuildScanExtension buildScan) {
 		exec("git", "rev-parse", "--short=8", "--verify", "HEAD").standardOut((gitCommitId) -> {
-			String commitIdLabel = "Git Commit ID";
+			String commitIdLabel = "Git commit";
 			buildScan.value(commitIdLabel, gitCommitId);
 			buildScan.link("Git commit build scans",
 					buildScan.getServer() + createSearchUrl(commitIdLabel, gitCommitId));
@@ -114,12 +122,12 @@ class BuildScanConfigurer implements Action<BuildScanExtension> {
 
 	private void addCiMetadata(BuildScanExtension buildScan) {
 		if (isBamboo()) {
-			buildScan.link("CI build", System.getenv(BAMBOO_RESULTS_ENV_VAR));
+			buildScan.link("CI build", this.env.get(BAMBOO_RESULTS_ENV_VAR));
 		}
 	}
 
 	private ExecResult getBranch() {
-		String branch = System.getenv("BRANCH");
+		String branch = this.env.get("BRANCH");
 		if (branch != null) {
 			return new ExecResult(branch);
 		}
