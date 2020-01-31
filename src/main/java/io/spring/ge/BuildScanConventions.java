@@ -81,7 +81,7 @@ class BuildScanConventions implements Action<BuildScanExtension> {
 	}
 
 	private boolean isCi() {
-		if (isBamboo() || isConcourse()) {
+		if (isBamboo() || isConcourse() || isJenkins()) {
 			return true;
 		}
 		return false;
@@ -93,6 +93,10 @@ class BuildScanConventions implements Action<BuildScanExtension> {
 
 	private boolean isConcourse() {
 		return this.env.containsKey("CI");
+	}
+
+	private boolean isJenkins() {
+		return this.env.containsKey("JENKINS_URL");
 	}
 
 	private void tagJdk(BuildScanExtension buildScan) {
@@ -123,6 +127,12 @@ class BuildScanConventions implements Action<BuildScanExtension> {
 	private void addCiMetadata(BuildScanExtension buildScan) {
 		if (isBamboo()) {
 			buildScan.link("CI build", this.env.get(BAMBOO_RESULTS_ENV_VAR));
+		}
+		else if (isJenkins()) {
+			String buildUrl = this.env.get("BUILD_URL");
+			if (hasText(buildUrl)) {
+				buildScan.link("CI build", buildUrl);
+			}
 		}
 	}
 
@@ -155,6 +165,10 @@ class BuildScanConventions implements Action<BuildScanExtension> {
 			spec.setWorkingDir(new File(".").getAbsolutePath());
 		});
 		return new ExecResult(standardOutput.toString().trim());
+	}
+
+	private boolean hasText(String string) {
+		return string != null && string.length() > 0;
 	}
 
 	private static final class ExecResult {

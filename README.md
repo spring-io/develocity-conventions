@@ -26,7 +26,7 @@ When applied alongside the [Gradle Enterprise Plugin](https://plugins.gradle.org
     - `Git status` when the working copy is dirty.
       The value is the output of `git status --porcelain`.
  - Add links:
-    - `CI build` when building on Bamboo, linking to the build on Bamboo.
+    - `CI build` when building on Bamboo or Jenkins, linking to the build on the CI server.
     - `Git commit build scans`, linking to scans for other builds of the same git commit.
 
 ### Git branch names
@@ -41,3 +41,5 @@ Bamboo is detected by looking for an environment variable named `bamboo_resultsU
 
 Concourse does not automatically set any environment variables in the build's container that allow its use to be detected.
 To work around this, an environment variable named `CI` can be set on the task.
+
+Jenkins is detected by looking for an environment variable named `JENKINS_URL`.

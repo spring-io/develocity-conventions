@@ -98,8 +98,24 @@ class BuildScanConventionsTests {
 	}
 
 	@Test
+	void whenJenkinsUrlAndBuildUrlEnvVarsArePresentThenBuildScanHasACiBuildLinkToBuildUrl() {
+		Map<String, String> env = new HashMap<>();
+		env.put("JENKINS_URL", "https://jenkins.example.com");
+		env.put("BUILD_URL", "https://jenkins.example.com/builds/123");
+		new BuildScanConventions(this.execOperations, env).execute(this.buildScan);
+		assertThat(this.buildScan.links).containsEntry("CI build", "https://jenkins.example.com/builds/123");
+	}
+
+	@Test
 	void whenCiEnvVarIsPresentThenBuildScanIsTaggedWithCiNotLocal() {
 		new BuildScanConventions(this.execOperations, Collections.singletonMap("CI", null)).execute(this.buildScan);
+		assertThat(this.buildScan.tags).contains("CI").doesNotContain("Local");
+	}
+
+	@Test
+	void whenJenkinsUrlEnvVarIsPresentThenBuildScanIsTaggedWithCiNotLocal() {
+		new BuildScanConventions(this.execOperations,
+				Collections.singletonMap("JENKINS_URL", "https://jenkins.example.com")).execute(this.buildScan);
 		assertThat(this.buildScan.tags).contains("CI").doesNotContain("Local");
 	}
 
