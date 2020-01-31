@@ -1,7 +1,7 @@
 # Gradle Enterprise Conventions Plugin
 
-A Gradle plugin for configuring projects to use the Gradle Enterprise instance hosted at [https://ge.spring.io](https://ge.spring.io).
-When applied, use of the build cache hosted at https://ge.spring.io/ is enabled.
+A Gradle plugin for configuring projects to use the Gradle Enterprise instance hosted at [ge.spring.io](https://ge.spring.io).
+When applied, use of the build cache hosted at https://ge.spring.io is enabled.
 When the [Gradle Enterprise Plugin](https://plugins.gradle.org/plugin/com.gradle.enterprise) is also applied, build scans are configured to use Spring conventions.
 
 ## Build cache conventions
@@ -28,7 +28,7 @@ When applied alongside the Gradle Enterprise plugin, the plugin will configure b
       The value is the output of `git status --porcelain`.
  - Add links:
     - `CI build` when building on Bamboo, linking to the build on Bamboo.
-    - `Git commit build scans`, links to scans for other builds of the same git commit.
+    - `Git commit build scans`, linking to scans for other builds of the same git commit.
 
 ### Git branch names
 
@@ -40,5 +40,5 @@ To work around this, an environment variable named `BRANCH` can be set on the ta
 
 Bamboo is detected by looking for an environment variable named `bamboo_resultsUrl`.
 
-Concourse does not set any environment variables in the build's container that allow its use to be detected.
+Concourse does not automatically set any environment variables in the build's container that allow its use to be detected.
 To work around this, an environment variable named `CI` can be set on the task.
