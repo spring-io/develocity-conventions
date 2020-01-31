@@ -1,6 +1,6 @@
-# Contributing to Spring Gradle Enterprise Plugin
+# Contributing to Gradle Enterprise Conventions Plugin
 
-Spring Gradle Enterprise Plugin is released under the Apache 2.0 license.
+Gradle Enterprise Conventions Plugin is released under the Apache 2.0 license.
 If you would like to contribute something, or simply want to work with the code, this document should help you to get started.
 
 ## Code of conduct

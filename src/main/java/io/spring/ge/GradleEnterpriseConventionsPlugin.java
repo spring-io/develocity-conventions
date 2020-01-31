@@ -19,6 +19,7 @@ package io.spring.ge;
 import javax.inject.Inject;
 
 import com.gradle.enterprise.gradleplugin.GradleEnterpriseExtension;
+import com.gradle.enterprise.gradleplugin.GradleEnterprisePlugin;
 import org.gradle.api.Plugin;
 import org.gradle.api.initialization.Settings;
 import org.gradle.api.internal.ProcessOperations;
@@ -30,20 +31,20 @@ import org.gradle.process.ExecOperations;
  *
  * @author Andy Wilkinson
  */
-public class GradleEnterprisePlugin implements Plugin<Settings> {
+public class GradleEnterpriseConventionsPlugin implements Plugin<Settings> {
 
 	private final ExecOperations execOperations;
 
 	@Inject
-	public GradleEnterprisePlugin(ProcessOperations processOperations) {
+	public GradleEnterpriseConventionsPlugin(ProcessOperations processOperations) {
 		this.execOperations = new ProcessOperationsExecOperations(processOperations);
 	}
 
 	@Override
 	public void apply(Settings settings) {
-		settings.getPlugins().withType(com.gradle.enterprise.gradleplugin.GradleEnterprisePlugin.class, (plugin) -> {
+		settings.getPlugins().withType(GradleEnterprisePlugin.class, (plugin) -> {
 			GradleEnterpriseExtension extension = settings.getExtensions().getByType(GradleEnterpriseExtension.class);
-			extension.buildScan(new BuildScanConfigurer(this.execOperations));
+			extension.buildScan(new BuildScanConventions(this.execOperations));
 		});
 	}
 

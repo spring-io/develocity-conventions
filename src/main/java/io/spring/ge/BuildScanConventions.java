@@ -30,12 +30,11 @@ import org.gradle.api.GradleException;
 import org.gradle.process.ExecOperations;
 
 /**
- * {@link Action} that configures a build scan to publish to Gradle Enterprise hosted at
- * <a href="https://ge.spring.io">ge.spring.io</a>.
+ * {@link Action} that configures the build scan with several Spring conventions.
  *
  * @author Andy Wilkinson
  */
-class BuildScanConfigurer implements Action<BuildScanExtension> {
+class BuildScanConventions implements Action<BuildScanExtension> {
 
 	private static final String BAMBOO_RESULTS_ENV_VAR = "bamboo_resultsUrl";
 
@@ -43,11 +42,11 @@ class BuildScanConfigurer implements Action<BuildScanExtension> {
 
 	private final ExecOperations execOperations;
 
-	BuildScanConfigurer(ExecOperations execOperations) {
+	BuildScanConventions(ExecOperations execOperations) {
 		this(execOperations, System.getenv());
 	}
 
-	BuildScanConfigurer(ExecOperations execOperations, Map<String, String> env) {
+	BuildScanConventions(ExecOperations execOperations, Map<String, String> env) {
 		this.execOperations = execOperations;
 		this.env = env;
 	}

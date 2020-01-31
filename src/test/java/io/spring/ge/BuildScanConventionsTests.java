@@ -45,11 +45,11 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 /**
- * Tests for {@link BuildScanConfigurer}.
+ * Tests for {@link BuildScanConventions}.
  *
  * @author Andy Wilkinson
  */
-class BuildScanConfigurerTests {
+class BuildScanConventionsTests {
 
 	private final TestExecOperations execOperations = new TestExecOperations();
 
@@ -57,13 +57,13 @@ class BuildScanConfigurerTests {
 
 	@Test
 	void capturingOfTaskInputsIsEnabled() {
-		new BuildScanConfigurer(this.execOperations).execute(this.buildScan);
+		new BuildScanConventions(this.execOperations).execute(this.buildScan);
 		assertThat(this.buildScan.isCaptureTaskInputFiles()).isTrue();
 	}
 
 	@Test
 	void ipAddressesAreObfuscated() throws UnknownHostException {
-		new BuildScanConfigurer(this.execOperations).execute(this.buildScan);
+		new BuildScanConventions(this.execOperations).execute(this.buildScan);
 		assertThat(this.buildScan.obfuscation.ipAddressesObfuscator).isNotNull();
 		List<String> obfuscatedAddresses = this.buildScan.obfuscation.ipAddressesObfuscator
 				.apply(Arrays.asList(InetAddress.getByName("10.0.0.1"), InetAddress.getByName("10.0.0.2")));
@@ -72,58 +72,58 @@ class BuildScanConfigurerTests {
 
 	@Test
 	void buildScansAreConfiguredToAlwaysPublishWhenAuthenticated() {
-		new BuildScanConfigurer(this.execOperations).execute(this.buildScan);
+		new BuildScanConventions(this.execOperations).execute(this.buildScan);
 		assertThat(this.buildScan.publishAlways).isTrue();
 		assertThat(this.buildScan.publishIfAuthenticated).isTrue();
 	}
 
 	@Test
 	void buildScansAreConfiguredToPublishToGeSpringIo() {
-		new BuildScanConfigurer(this.execOperations).execute(this.buildScan);
+		new BuildScanConventions(this.execOperations).execute(this.buildScan);
 		assertThat(this.buildScan.server).isEqualTo("https://ge.spring.io");
 	}
 
 	@Test
 	void whenBambooResultEnvVarIsPresentThenBuildScanIsTaggedWithCiNotLocal() {
-		new BuildScanConfigurer(this.execOperations,
+		new BuildScanConventions(this.execOperations,
 				Collections.singletonMap("bamboo_resultsUrl", "https://bamboo.exampl.com")).execute(this.buildScan);
 		assertThat(this.buildScan.tags).contains("CI").doesNotContain("Local");
 	}
 
 	@Test
 	void whenBambooResultEnvVarIsPresentThenBuildScanHasACiBuildLinkToIt() {
-		new BuildScanConfigurer(this.execOperations,
+		new BuildScanConventions(this.execOperations,
 				Collections.singletonMap("bamboo_resultsUrl", "https://bamboo.example.com")).execute(this.buildScan);
 		assertThat(this.buildScan.links).containsEntry("CI build", "https://bamboo.example.com");
 	}
 
 	@Test
 	void whenCiEnvVarIsPresentThenBuildScanIsTaggedWithCiNotLocal() {
-		new BuildScanConfigurer(this.execOperations, Collections.singletonMap("CI", null)).execute(this.buildScan);
+		new BuildScanConventions(this.execOperations, Collections.singletonMap("CI", null)).execute(this.buildScan);
 		assertThat(this.buildScan.tags).contains("CI").doesNotContain("Local");
 	}
 
 	@Test
 	void whenNoCiIndicatorsArePresentThenBuildScanIsTaggedWithLocalNotCi() {
-		new BuildScanConfigurer(this.execOperations).execute(this.buildScan);
+		new BuildScanConventions(this.execOperations).execute(this.buildScan);
 		assertThat(this.buildScan.tags).contains("Local").doesNotContain("CI");
 	}
 
 	@Test
 	void buildScanIsTaggedWithJdkVersion() {
-		new BuildScanConfigurer(this.execOperations).execute(this.buildScan);
+		new BuildScanConventions(this.execOperations).execute(this.buildScan);
 		assertThat(this.buildScan.tags).contains("JDK-" + System.getProperty("java.specification.version"));
 	}
 
 	@Test
 	void buildScanIsTaggedWithOperatingSystem() {
-		new BuildScanConfigurer(this.execOperations).execute(this.buildScan);
+		new BuildScanConventions(this.execOperations).execute(this.buildScan);
 		assertThat(this.buildScan.tags).contains(System.getProperty("os.name"));
 	}
 
 	@Test
 	void whenBranchEnvVarIsPresentThenBuildScanIsTaggedAndConfiguredWithCustomValue() {
-		new BuildScanConfigurer(this.execOperations, Collections.singletonMap("BRANCH", "1.1.x"))
+		new BuildScanConventions(this.execOperations, Collections.singletonMap("BRANCH", "1.1.x"))
 				.execute(this.buildScan);
 		assertThat(this.buildScan.tags).contains("1.1.x");
 		assertThat(this.buildScan.values).containsEntry("Git branch", "1.1.x");
@@ -132,7 +132,7 @@ class BuildScanConfigurerTests {
 	@Test
 	void whenBranchEnvVarIsNotPresentThenBuildScanIsTaggedWithBranchFromGit() {
 		this.execOperations.commandLineOutput.put(Arrays.asList("git", "rev-parse", "--abbrev-ref", "HEAD"), "1.2.x");
-		new BuildScanConfigurer(this.execOperations).execute(this.buildScan);
+		new BuildScanConventions(this.execOperations).execute(this.buildScan);
 		assertThat(this.buildScan.tags).contains("1.2.x");
 		assertThat(this.buildScan.values).containsEntry("Git branch", "1.2.x");
 	}
@@ -141,7 +141,7 @@ class BuildScanConfigurerTests {
 	void buildScanHasGitCommitIdCustomValueAndLinkToBuildScansForTheSameCommit() {
 		this.execOperations.commandLineOutput.put(Arrays.asList("git", "rev-parse", "--short=8", "--verify", "HEAD"),
 				"79ce52f8");
-		new BuildScanConfigurer(this.execOperations).execute(this.buildScan);
+		new BuildScanConventions(this.execOperations).execute(this.buildScan);
 		assertThat(this.buildScan.values).containsEntry("Git commit", "79ce52f8");
 		assertThat(this.buildScan.links).containsEntry("Git commit build scans",
 				"https://ge.spring.io/scans?search.names=Git+commit&search.values=79ce52f8");
@@ -150,7 +150,7 @@ class BuildScanConfigurerTests {
 	@Test
 	void whenGitStatusIsCleanThenBuildScanIsNotTaggedDirtyAndHasNotGitStatusCustomValue() {
 		this.execOperations.commandLineOutput.put(Arrays.asList("git", "status", "--porcelain"), "");
-		new BuildScanConfigurer(this.execOperations).execute(this.buildScan);
+		new BuildScanConventions(this.execOperations).execute(this.buildScan);
 		assertThat(this.buildScan.tags).doesNotContain("dirty");
 		assertThat(this.buildScan.values).doesNotContainKey("Git status");
 	}
@@ -158,7 +158,7 @@ class BuildScanConfigurerTests {
 	@Test
 	void whenGitStatusIsDirtyThenBuildScanIsTaggedDirtyAndHasGitStatusCustomValue() {
 		this.execOperations.commandLineOutput.put(Arrays.asList("git", "status", "--porcelain"), " M build.gradle");
-		new BuildScanConfigurer(this.execOperations).execute(this.buildScan);
+		new BuildScanConventions(this.execOperations).execute(this.buildScan);
 		assertThat(this.buildScan.tags).contains("dirty");
 		assertThat(this.buildScan.values).containsEntry("Git status", "M build.gradle");
 	}

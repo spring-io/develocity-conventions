@@ -30,8 +30,8 @@ checkstyle {
 gradlePlugin {
 	plugins {
 		gradleEnterprisePlugin {
-			id = 'io.spring.ge'
-			implementationClass = 'io.spring.ge.GradleEnterprisePlugin'
+			id = 'io.spring.gradle-enterprise-conventions'
+			implementationClass = 'io.spring.ge.GradleEnterpriseConventionsPlugin'
 		}
 	}
 }
