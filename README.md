@@ -1,23 +1,22 @@
 # Gradle Enterprise Conventions Plugin
 
 A Gradle plugin for configuring projects to use the Gradle Enterprise instance hosted at [ge.spring.io](https://ge.spring.io).
-When applied, use of the build cache hosted at https://ge.spring.io is enabled.
-When the [Gradle Enterprise Plugin](https://plugins.gradle.org/plugin/com.gradle.enterprise) is also applied, build scans are configured to use Spring conventions.
 
 ## Build cache conventions
 
-When applied, the plugin will configure the build cache to:
+When applied and the build cache is enabled (`org.gradle.caching=true` in `gradle.properties`), the plugin will configure the build cache to:
 
 - Enable local caching.
+- Use https://ge.spring.io/cache/ as the remote cache.
 - Enable pulling from the remote cache.
-- Enable pusing to the remote cache if the `GRADLE_ENTERPRISE_CACHE_USERNAME` and `GRADLE_ENTERPRISE_CACHE_PASSWORD` environment variables are set.
+- Enable pushing to the remote cache if the `GRADLE_ENTERPRISE_CACHE_USERNAME` and `GRADLE_ENTERPRISE_CACHE_PASSWORD` environment variables are set.
 
 ## Build scan conventions
 
-When applied alongside the Gradle Enterprise plugin, the plugin will configure build scans to:
+When applied alongside the [Gradle Enterprise Plugin](https://plugins.gradle.org/plugin/com.gradle.enterprise), the plugin will configure build scans to:
 
 - Add tags:
-    - `JDK-<version>`, where `version` is the specification version of the JDK running the build.
+    - `JDK-<version>`, where `<version>` is the specification version of the JDK running the build.
     - `CI` or `Local` depending on where the build is executing.
     - `dirty` if the git working copy is dirty.
     - Name of the git branch being built.
