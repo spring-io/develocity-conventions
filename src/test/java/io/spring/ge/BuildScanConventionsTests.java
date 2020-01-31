@@ -203,7 +203,7 @@ class BuildScanConventionsTests {
 
 		@Override
 		public BuildScanDataObfuscation getObfuscation() {
-			throw new UnsupportedOperationException();
+			return this.obfuscation;
 		}
 
 		@Override
@@ -233,7 +233,7 @@ class BuildScanConventionsTests {
 
 		@Override
 		public void obfuscation(Action<? super BuildScanDataObfuscation> action) {
-			action.execute(this.obfuscation);
+			throw new UnsupportedOperationException();
 		}
 
 		@Override
@@ -241,7 +241,7 @@ class BuildScanConventionsTests {
 			this.publishAlways = true;
 		}
 
-		void publishIfAuthenticated() {
+		public void publishIfAuthenticated() {
 			this.publishIfAuthenticated = true;
 		}
 

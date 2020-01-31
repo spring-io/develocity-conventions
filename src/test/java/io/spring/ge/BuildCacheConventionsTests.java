@@ -102,8 +102,9 @@ class BuildCacheConventionsTests {
 		}
 
 		@Override
+		@SuppressWarnings("unchecked")
 		public <T extends BuildCache> T remote(Class<T> cacheType) {
-			throw new UnsupportedOperationException();
+			return (T) this.remote;
 		}
 
 		@Override
@@ -112,10 +113,8 @@ class BuildCacheConventionsTests {
 		}
 
 		@Override
-		@SuppressWarnings("unchecked")
 		public <T extends BuildCache> T remote(Class<T> type, Action<? super T> action) {
-			action.execute((T) this.remote);
-			return (T) this.remote;
+			throw new UnsupportedOperationException();
 		}
 
 	}

@@ -30,7 +30,7 @@ import org.gradle.caching.http.HttpBuildCacheCredentials;
  *
  * @author Andy Wilkinson
  */
-public class BuildCacheConventions implements Action<BuildCacheConfiguration> {
+class BuildCacheConventions implements Action<BuildCacheConfiguration> {
 
 	private final Map<String, String> env;
 
@@ -45,18 +45,17 @@ public class BuildCacheConventions implements Action<BuildCacheConfiguration> {
 	@Override
 	public void execute(BuildCacheConfiguration buildCache) {
 		buildCache.getLocal().setEnabled(true);
-		buildCache.remote(HttpBuildCache.class, (httpCache) -> {
-			httpCache.setEnabled(true);
-			httpCache.setUrl("https://ge.spring.io/cache/");
-			String username = this.env.get("GRADLE_ENTERPRISE_CACHE_USERNAME");
-			String password = this.env.get("GRADLE_ENTERPRISE_CACHE_PASSWORD");
-			if (hasText(username) && hasText(password)) {
-				httpCache.setPush(true);
-				HttpBuildCacheCredentials credentials = httpCache.getCredentials();
-				credentials.setUsername(username);
-				credentials.setPassword(password);
-			}
-		});
+		HttpBuildCache httpCache = buildCache.remote(HttpBuildCache.class);
+		httpCache.setEnabled(true);
+		httpCache.setUrl("https://ge.spring.io/cache/");
+		String username = this.env.get("GRADLE_ENTERPRISE_CACHE_USERNAME");
+		String password = this.env.get("GRADLE_ENTERPRISE_CACHE_PASSWORD");
+		if (hasText(username) && hasText(password)) {
+			httpCache.setPush(true);
+			HttpBuildCacheCredentials credentials = httpCache.getCredentials();
+			credentials.setUsername(username);
+			credentials.setPassword(password);
+		}
 	}
 
 	private boolean hasText(String string) {

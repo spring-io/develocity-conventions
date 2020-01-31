@@ -55,8 +55,8 @@ class BuildScanConventions implements Action<BuildScanExtension> {
 	@Override
 	public void execute(BuildScanExtension buildScan) {
 		buildScan.setCaptureTaskInputFiles(true);
-		buildScan.obfuscation((obfuscation) -> obfuscation.ipAddresses(
-				(addresses) -> addresses.stream().map((address) -> "0.0.0.0").collect(Collectors.toList())));
+		buildScan.getObfuscation().ipAddresses(
+				(addresses) -> addresses.stream().map((address) -> "0.0.0.0").collect(Collectors.toList()));
 		buildScan.publishAlways();
 		try {
 			buildScan.getClass().getMethod("publishIfAuthenticated").invoke(buildScan);
