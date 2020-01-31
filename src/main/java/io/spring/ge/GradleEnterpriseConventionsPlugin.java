@@ -46,6 +46,7 @@ public class GradleEnterpriseConventionsPlugin implements Plugin<Settings> {
 			GradleEnterpriseExtension extension = settings.getExtensions().getByType(GradleEnterpriseExtension.class);
 			extension.buildScan(new BuildScanConventions(this.execOperations));
 		});
+		settings.buildCache(new BuildCacheConventions());
 	}
 
 }
