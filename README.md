@@ -9,8 +9,14 @@ When applied and the build cache is enabled (`org.gradle.caching=true` in `gradl
 - Enable local caching.
 - Use https://ge.spring.io/cache/ as the remote cache.
 - Enable pulling from the remote cache.
-- Enable pushing to the remote cache if the `GRADLE_ENTERPRISE_CACHE_USERNAME` and `GRADLE_ENTERPRISE_CACHE_PASSWORD` environment variables are set.
+- Enable pushing to the remote cache if the required credentials are available.
 
+### Remote cache credentials
+
+**Credentials must not be configured in environments where pull requests are built.**
+
+Pushing to the remote cache requires authentication.
+The necessary credentials can be provided using the `GRADLE_ENTERPRISE_CACHE_USERNAME` and `GRADLE_ENTERPRISE_CACHE_PASSWORD` environment variables.
 On Bamboo, the username and password environment variables should be set using `${bamboo.ge.cache.username}` and `${bamboo.ge.cache.password}` respectively.
 On Concourse, the username and password environment variables should be set using `((gradle_enterprise_cache_user.username))` and `((gradle_enterprise_cache_user.password))` from CredHub respectively.
 On Jeninks, the username and password environment variables should be set using the `gradle_enterprise_cache_user` username with password credential.
@@ -34,13 +40,16 @@ When applied alongside the [Gradle Enterprise Plugin](https://plugins.gradle.org
     - `CI build` when building on Bamboo or Jenkins, linking to the build on the CI server.
     - `Git commit build scans`, linking to scans for other builds of the same git commit.
 
+### Build scan publishing credentials
+
+**Credentials must not be configured in environments where pull requests are built.**
+
 Publishing to [ge.spring.io](https://ge.spring.io) requires authentication via an access key.
 When running on CI, the access key should be made available via the `GRADLE_ENTERPRISE_ACCESS_KEY` environment variable.
 On Bamboo, the environment variable should be set to `${bamboo.gradle_enterprise_secret_access_key}`.
 On Concourse, the environment variable should be set using `((gradle_enterprise_secret_access_key))` from CredHub.
 On Jenkins, the environment variable should be set using the `gradle_enterprise_secret_access_key` secret text credential.
 When running locally, an access key can be provisioned by running `./gradlew provisionGradleEnterpriseAccessKey` once the project has been configured to use this plugin.
-
 
 ### Git branch names
 
