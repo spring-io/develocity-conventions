@@ -1,0 +1,6 @@
+github-repo: "https://github.com/spring-gradle-plugins/gradle-enterprise-conventions-plugin.git"
+github-repo-name: "spring-gradle-plugins/gradle-enterprise-conventions-plugin"
+docker-hub-organization: "springci"
+artifactory-server: "https://repo.spring.io"
+branch: "master"
+build-name: "gradle-enterprise-conventions-plugin"

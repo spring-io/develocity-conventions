@@ -1,0 +1,233 @@
+resource_types:
+- name: artifactory-resource
+  type: docker-image
+  source:
+    repository: springio/artifactory-resource
+    tag: 0.0.11-SNAPSHOT
+resources:
+- name: git-repo
+  type: git
+  source:
+    uri: ((github-repo))
+    username: ((github-username))
+    password: ((github-password))
+    branch: ((branch))
+    ignore_paths: ["ci/image/*"]
+- name: github-pre-release
+  type: github-release
+  source:
+    owner: spring-gradle-plugins
+    repository: gradle-enterprise-conventions-plugin
+    access_token: ((github-release-notes-access-token))
+    pre_release: true
+- name: github-release
+  type: github-release
+  source:
+    owner: spring-gradle-plugins
+    repository: gradle-enterprise-conventions-plugin
+    access_token: ((github-release-notes-access-token))
+    pre_release: false
+- name: ci-image-git-repo
+  type: git
+  source:
+    uri: ((github-repo))
+    branch: ((branch))
+    paths: ["ci/image/*"]
+- name: ci-image
+  type: docker-image
+  source:
+    repository: ((docker-hub-organization))/gradle-enterprise-conventions-plugin-ci-image
+    username: ((docker-hub-username))
+    password: ((docker-hub-password))
+    tag: ((branch))
+- name: artifactory-repo
+  type: artifactory-resource
+  source:
+    uri: ((artifactory-server))
+    username: ((artifactory-username))
+    password: ((artifactory-password))
+    build_name: ((build-name))
+jobs:
+- name: build-ci-image
+  plan:
+  - get: ci-image-git-repo
+    trigger: true
+  - put: ci-image
+    params:
+      build: ci-image-git-repo/ci/image/
+- name: build
+  serial: true
+  public: true
+  plan:
+  - get: ci-image
+  - get: git-repo
+    trigger: true
+  - do:
+    - task: build-project
+      privileged: true
+      timeout: 1h30m
+      image: ci-image
+      file: git-repo/ci/tasks/build-project.yml
+  - put: artifactory-repo
+    params: &artifactory-params
+      repo: plugins-snapshot-local
+      build_number: "${BUILD_ID}"
+      folder: distribution-repository
+      build_uri: "https://ci.spring.io/teams/${BUILD_TEAM_NAME}/pipelines/${BUILD_PIPELINE_NAME}/jobs/${BUILD_JOB_NAME}/builds/${BUILD_NAME}"
+      build_number: "${BUILD_PIPELINE_NAME}-${BUILD_JOB_NAME}-${BUILD_NAME}"
+      disable_checksum_uploads: true
+- name: stage-milestone
+  serial: true
+  plan:
+  - get: ci-image
+  - get: git-repo
+    trigger: false
+  - task: stage
+    image: ci-image
+    file: git-repo/ci/tasks/stage.yml
+    params:
+      RELEASE_TYPE: M
+  - put: artifactory-repo
+    params:
+      <<: *artifactory-params
+      repo: libs-staging-local
+  - put: git-repo
+    params:
+      repository: stage-git-repo
+- name: stage-rc
+  serial: true
+  plan:
+  - get: ci-image
+  - get: git-repo
+    trigger: false
+  - task: stage
+    image: ci-image
+    file: git-repo/ci/tasks/stage.yml
+    params:
+      RELEASE_TYPE: RC
+  - put: artifactory-repo
+    params:
+      <<: *artifactory-params
+      repo: libs-staging-local
+  - put: git-repo
+    params:
+      repository: stage-git-repo
+- name: stage-release
+  serial: true
+  plan:
+  - get: ci-image
+  - get: git-repo
+    trigger: false
+  - task: stage
+    image: ci-image
+    file: git-repo/ci/tasks/stage.yml
+    params:
+      RELEASE_TYPE: RELEASE
+  - put: artifactory-repo
+    params:
+      <<: *artifactory-params
+      repo: libs-staging-local
+  - put: git-repo
+    params:
+      repository: stage-git-repo
+- name: promote-milestone
+  serial: true
+  plan:
+  - get: ci-image
+  - get: git-repo
+    trigger: false
+  - get: artifactory-repo
+    trigger: false
+    passed: [stage-milestone]
+    params:
+      save_build_info: true
+  - task: promote
+    image: ci-image
+    file: git-repo/ci/tasks/promote.yml
+    params:
+      RELEASE_TYPE: M
+      ARTIFACTORY_SERVER: ((artifactory-server))
+      ARTIFACTORY_USERNAME: ((artifactory-username))
+      ARTIFACTORY_PASSWORD: ((artifactory-password))
+  - task: generate-release-notes
+    file: git-repo/ci/tasks/generate-release-notes.yml
+    params:
+      RELEASE_TYPE: M
+      GITHUB_USERNAME: ((github-username))
+      GITHUB_TOKEN: ((github-release-notes-access-token))
+  - put: github-pre-release
+    params:
+      name: generated-release-notes/tag
+      tag: generated-release-notes/tag
+      body: generated-release-notes/release-notes.md
+- name: promote-rc
+  serial: true
+  plan:
+  - get: ci-image
+  - get: git-repo
+    trigger: false
+  - get: artifactory-repo
+    trigger: false
+    passed: [stage-rc]
+    params:
+      save_build_info: true
+  - task: promote
+    image: ci-image
+    file: git-repo/ci/tasks/promote.yml
+    params:
+      RELEASE_TYPE: RC
+      ARTIFACTORY_SERVER: ((artifactory-server))
+      ARTIFACTORY_USERNAME: ((artifactory-username))
+      ARTIFACTORY_PASSWORD: ((artifactory-password))
+  - task: generate-release-notes
+    file: git-repo/ci/tasks/generate-release-notes.yml
+    params:
+      RELEASE_TYPE: RC
+      GITHUB_USERNAME: ((github-username))
+      GITHUB_TOKEN: ((github-release-notes-access-token))
+  - put: github-pre-release
+    params:
+      name: generated-release-notes/tag
+      tag: generated-release-notes/tag
+      body: generated-release-notes/release-notes.md
+- name: promote-release
+  serial: true
+  plan:
+  - get: ci-image
+  - get: git-repo
+    trigger: false
+  - get: artifactory-repo
+    trigger: false
+    passed: [stage-release]
+    params:
+      save_build_info: true
+  - task: promote
+    image: ci-image
+    file: git-repo/ci/tasks/promote.yml
+    params:
+      RELEASE_TYPE: RELEASE
+      ARTIFACTORY_SERVER: ((artifactory-server))
+      ARTIFACTORY_USERNAME: ((artifactory-username))
+      ARTIFACTORY_PASSWORD: ((artifactory-password))
+      BINTRAY_SUBJECT: ((bintray-subject))
+      BINTRAY_REPO: ((bintray-repo))
+      BINTRAY_USERNAME: ((bintray-username))
+      BINTRAY_API_KEY: ((bintray-api-key))
+  - task: generate-release-notes
+    file: git-repo/ci/tasks/generate-release-notes.yml
+    params:
+      RELEASE_TYPE: RELEASE
+      GITHUB_USERNAME: ((github-username))
+      GITHUB_TOKEN: ((github-release-notes-access-token))
+  - put: github-release
+    params:
+      name: generated-release-notes/tag
+      tag: generated-release-notes/tag
+      body: generated-release-notes/release-notes.md
+groups:
+- name: "Build"
+  jobs: ["build"]
+- name: "Release"
+  jobs: ["stage-milestone", "stage-rc", "stage-release", "promote-milestone", "promote-rc", "promote-release"]
+- name: "CI Image"
+  jobs: ["build-ci-image"]

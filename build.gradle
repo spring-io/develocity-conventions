@@ -35,3 +35,14 @@ gradlePlugin {
 		}
 	}
 }
+
+if (project.hasProperty("distributionRepository")) {
+	publishing {
+		repositories {
+			maven {
+				url = "${distributionRepository}"
+				name = "deployment"
+			}
+		}
+	}
+}
