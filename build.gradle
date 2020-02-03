@@ -46,3 +46,7 @@ if (project.hasProperty("distributionRepository")) {
 		}
 	}
 }
+
+tasks.withType(GenerateModuleMetadata).all {
+	enabled = false
+}
