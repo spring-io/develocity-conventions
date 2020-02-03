@@ -13,7 +13,7 @@ When applied and the build cache is enabled (`org.gradle.caching=true` in `gradl
 
 ### Remote cache credentials
 
-**Credentials must not be configured in environments where pull requests are built.**
+:rotating_light: **Credentials must not be configured in environments where pull requests are built.** :rotating_light:
 
 Pushing to the remote cache requires authentication.
 The necessary credentials can be provided using the `GRADLE_ENTERPRISE_CACHE_USERNAME` and `GRADLE_ENTERPRISE_CACHE_PASSWORD` environment variables.
@@ -50,7 +50,7 @@ When applied alongside the [Gradle Enterprise Plugin](https://plugins.gradle.org
 
 ### Build scan publishing credentials
 
-**Credentials must not be configured in environments where pull requests are built.**
+:rotating_light: **Credentials must not be configured in environments where pull requests are built.** :rotating_light:
 
 Publishing to [ge.spring.io](https://ge.spring.io) requires authentication via an access key.
 When running on CI, the access key should be made available via the `GRADLE_ENTERPRISE_ACCESS_KEY` environment variable.
