@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 import com.gradle.scan.plugin.BuildScanExtension;
 import org.gradle.api.Action;
 import org.gradle.api.GradleException;
-import org.gradle.process.ExecOperations;
+import org.gradle.api.internal.ProcessOperations;
 
 /**
  * {@link Action} that configures the {@link BuildScanExtension build scan} with Spring
@@ -41,14 +41,14 @@ class BuildScanConventions implements Action<BuildScanExtension> {
 
 	private final Map<String, String> env;
 
-	private final ExecOperations execOperations;
+	private final ProcessOperations processOperations;
 
-	BuildScanConventions(ExecOperations execOperations) {
-		this(execOperations, System.getenv());
+	BuildScanConventions(ProcessOperations processOperations) {
+		this(processOperations, System.getenv());
 	}
 
-	BuildScanConventions(ExecOperations execOperations, Map<String, String> env) {
-		this.execOperations = execOperations;
+	BuildScanConventions(ProcessOperations execOperations, Map<String, String> env) {
+		this.processOperations = execOperations;
 		this.env = env;
 	}
 
@@ -159,7 +159,7 @@ class BuildScanConventions implements Action<BuildScanExtension> {
 
 	private ExecResult exec(Object... commandLine) {
 		ByteArrayOutputStream standardOutput = new ByteArrayOutputStream();
-		this.execOperations.exec((spec) -> {
+		this.processOperations.exec((spec) -> {
 			spec.setCommandLine(commandLine);
 			spec.setStandardOutput(standardOutput);
 			spec.setWorkingDir(new File(".").getAbsolutePath());

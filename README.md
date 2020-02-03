@@ -4,7 +4,9 @@ A Gradle plugin for configuring projects to use the Gradle Enterprise instance h
 
 ## Build cache conventions
 
-When applied and the build cache is enabled (`org.gradle.caching=true` in `gradle.properties`), the plugin will configure the build cache to:
+Configuring build cache conventions requires Gradle 6.0 or later.
+
+When applied as a settings plugin and the build cache is enabled (`org.gradle.caching=true` in `gradle.properties`), the plugin will configure the build cache to:
 
 - Enable local caching.
 - Use https://ge.spring.io/cache/ as the remote cache.
@@ -32,7 +34,8 @@ The username and password environment variables should be set using the `gradle_
 
 ## Build scan conventions
 
-When applied alongside the [Gradle Enterprise Plugin](https://plugins.gradle.org/plugin/com.gradle.enterprise), the plugin will configure publishing of build scans to [ge.spring.io](https://ge.spring.io) when authenticated. The build scans will be customized to:
+When applied as a settings plugin (Gradle 6) or a project plugin (Gradle 5) alongside the [Gradle Enterprise Plugin](https://plugins.gradle.org/plugin/com.gradle.enterprise), the plugin will configure publishing of build scans to [ge.spring.io](https://ge.spring.io) when authenticated.
+The build scans will be customized to:
 
 - Add tags:
     - `JDK-<version>`, where `<version>` is the specification version of the JDK running the build.

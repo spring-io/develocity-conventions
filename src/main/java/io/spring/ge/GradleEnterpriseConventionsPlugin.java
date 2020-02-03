@@ -20,33 +20,50 @@ import javax.inject.Inject;
 
 import com.gradle.enterprise.gradleplugin.GradleEnterpriseExtension;
 import com.gradle.enterprise.gradleplugin.GradleEnterprisePlugin;
+import com.gradle.scan.plugin.BuildScanExtension;
 import org.gradle.api.Plugin;
+import org.gradle.api.Project;
 import org.gradle.api.initialization.Settings;
 import org.gradle.api.internal.ProcessOperations;
-import org.gradle.process.ExecOperations;
 
 /**
- * {@link Settings} {@link Plugin plugin} for configuring the use of Gradle Enterprise
- * hosted at <a href="https://ge.spring.io">ge.spring.io</a>.
+ * {@link Plugin plugin} for configuring the use of Gradle Enterprise hosted at
+ * <a href="https://ge.spring.io">ge.spring.io</a>.
  *
  * @author Andy Wilkinson
  */
-public class GradleEnterpriseConventionsPlugin implements Plugin<Settings> {
+public class GradleEnterpriseConventionsPlugin implements Plugin<Object> {
 
-	private final ExecOperations execOperations;
+	private final BuildScanConventions buildScanConventions;
 
 	@Inject
 	public GradleEnterpriseConventionsPlugin(ProcessOperations processOperations) {
-		this.execOperations = new ProcessOperationsExecOperations(processOperations);
+		this.buildScanConventions = new BuildScanConventions(processOperations);
 	}
 
 	@Override
-	public void apply(Settings settings) {
+	public void apply(Object target) {
+		if (target instanceof Settings) {
+			apply((Settings) target);
+		}
+		else if (target instanceof Project) {
+			apply((Project) target);
+		}
+	}
+
+	private void apply(Settings settings) {
 		settings.getPlugins().withType(GradleEnterprisePlugin.class, (plugin) -> {
 			GradleEnterpriseExtension extension = settings.getExtensions().getByType(GradleEnterpriseExtension.class);
-			extension.buildScan(new BuildScanConventions(this.execOperations));
+			extension.buildScan(this.buildScanConventions);
 		});
 		settings.buildCache(new BuildCacheConventions());
+	}
+
+	private void apply(Project project) {
+		project.getPlugins().withId("com.gradle.build-scan", (plugin) -> {
+			BuildScanExtension buildScan = project.getExtensions().getByType(BuildScanExtension.class);
+			this.buildScanConventions.execute(buildScan);
+		});
 	}
 
 }
