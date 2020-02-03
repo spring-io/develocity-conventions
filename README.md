@@ -17,15 +17,23 @@ When applied and the build cache is enabled (`org.gradle.caching=true` in `gradl
 
 Pushing to the remote cache requires authentication.
 The necessary credentials can be provided using the `GRADLE_ENTERPRISE_CACHE_USERNAME` and `GRADLE_ENTERPRISE_CACHE_PASSWORD` environment variables.
-On Bamboo, the username and password environment variables should be set using `${bamboo.ge.cache.username}` and `${bamboo.ge.cache.password}` respectively.
-On Concourse, the username and password environment variables should be set using `((gradle_enterprise_cache_user.username))` and `((gradle_enterprise_cache_user.password))` from CredHub respectively.
-On Jeninks, the username and password environment variables should be set using the `gradle_enterprise_cache_user` username with password credential.
+
+#### Bamboo
+
+The username and password environment variables should be set using `${bamboo.ge.cache.username}` and `${bamboo.ge.cache.password}` respectively.
+
+#### Concourse
+
+The username and password environment variables should be set using `((gradle_enterprise_cache_user.username))` and `((gradle_enterprise_cache_user.password))` from CredHub respectively.
+
+#### Jenkins
+
+The username and password environment variables should be set using the `gradle_enterprise_cache_user` username with password credential.
 
 ## Build scan conventions
 
-When applied alongside the [Gradle Enterprise Plugin](https://plugins.gradle.org/plugin/com.gradle.enterprise), the plugin will configure build scans to:
+When applied alongside the [Gradle Enterprise Plugin](https://plugins.gradle.org/plugin/com.gradle.enterprise), the plugin will configure publishing of build scans to [ge.spring.io](https://ge.spring.io) when authenticated. The build scans will be customized to:
 
-- Publish to [ge.spring.io](https://ge.spring.io)
 - Add tags:
     - `JDK-<version>`, where `<version>` is the specification version of the JDK running the build.
     - `CI` or `Local` depending on where the build is executing.
@@ -46,10 +54,22 @@ When applied alongside the [Gradle Enterprise Plugin](https://plugins.gradle.org
 
 Publishing to [ge.spring.io](https://ge.spring.io) requires authentication via an access key.
 When running on CI, the access key should be made available via the `GRADLE_ENTERPRISE_ACCESS_KEY` environment variable.
-On Bamboo, the environment variable should be set to `${bamboo.gradle_enterprise_secret_access_key}`.
-On Concourse, the environment variable should be set using `((gradle_enterprise_secret_access_key))` from CredHub.
-On Jenkins, the environment variable should be set using the `gradle_enterprise_secret_access_key` secret text credential.
-When running locally, an access key can be provisioned by running `./gradlew provisionGradleEnterpriseAccessKey` once the project has been configured to use this plugin.
+
+#### Bamboo
+
+The environment variable should be set to `${bamboo.gradle_enterprise_secret_access_key}`.
+
+#### Concourse
+
+The environment variable should be set using `((gradle_enterprise_secret_access_key))` from CredHub.
+
+#### Jenkins
+
+The environment variable should be set using the `gradle_enterprise_secret_access_key` secret text credential.
+
+#### Local
+
+An access key can be provisioned by running `./gradlew provisionGradleEnterpriseAccessKey` once the project has been configured to use this plugin.
 
 ### Git branch names
 
