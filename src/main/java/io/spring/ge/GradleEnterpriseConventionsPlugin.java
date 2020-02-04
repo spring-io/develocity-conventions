@@ -16,11 +16,14 @@
 
 package io.spring.ge;
 
+import java.io.File;
+
 import javax.inject.Inject;
 
 import com.gradle.enterprise.gradleplugin.GradleEnterpriseExtension;
 import com.gradle.enterprise.gradleplugin.GradleEnterprisePlugin;
 import com.gradle.scan.plugin.BuildScanExtension;
+import org.gradle.StartParameter;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.initialization.Settings;
@@ -54,19 +57,24 @@ public class GradleEnterpriseConventionsPlugin implements Plugin<Object> {
 	private void apply(Settings settings) {
 		settings.getPlugins().withType(GradleEnterprisePlugin.class, (plugin) -> {
 			GradleEnterpriseExtension extension = settings.getExtensions().getByType(GradleEnterpriseExtension.class);
-			extension.buildScan(new BuildScanConventions(
-					new WorkingDirectoryProcessOperations(this.processOperations, settings.getRootDir())));
+			configureBuildScanConventions(extension.getBuildScan(), settings.getStartParameter(),
+					settings.getRootDir());
 		});
 		settings.buildCache(new BuildCacheConventions());
 	}
 
 	private void apply(Project project) {
-		project.getPlugins().withId("com.gradle.build-scan", (plugin) -> {
-			BuildScanExtension buildScan = project.getExtensions().getByType(BuildScanExtension.class);
-			new BuildScanConventions(
-					new WorkingDirectoryProcessOperations(this.processOperations, project.getRootDir()))
-							.execute(buildScan);
-		});
+		project.getPlugins().withId("com.gradle.build-scan",
+				(plugin) -> configureBuildScanConventions(project.getExtensions().getByType(BuildScanExtension.class),
+						project.getGradle().getStartParameter(), project.getRootDir()));
+	}
+
+	private void configureBuildScanConventions(BuildScanExtension buildScan, StartParameter startParameter,
+			File rootDir) {
+		if (!startParameter.isNoBuildScan()) {
+			new BuildScanConventions(new WorkingDirectoryProcessOperations(this.processOperations, rootDir))
+					.execute(buildScan);
+		}
 	}
 
 }
