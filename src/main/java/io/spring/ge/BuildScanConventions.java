@@ -17,7 +17,6 @@
 package io.spring.ge;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Map;
@@ -162,7 +161,6 @@ class BuildScanConventions implements Action<BuildScanExtension> {
 		this.processOperations.exec((spec) -> {
 			spec.setCommandLine(commandLine);
 			spec.setStandardOutput(standardOutput);
-			spec.setWorkingDir(new File(".").getAbsolutePath());
 		});
 		return new ExecResult(standardOutput.toString().trim());
 	}

@@ -34,11 +34,11 @@ import org.gradle.api.internal.ProcessOperations;
  */
 public class GradleEnterpriseConventionsPlugin implements Plugin<Object> {
 
-	private final BuildScanConventions buildScanConventions;
+	private final ProcessOperations processOperations;
 
 	@Inject
 	public GradleEnterpriseConventionsPlugin(ProcessOperations processOperations) {
-		this.buildScanConventions = new BuildScanConventions(processOperations);
+		this.processOperations = processOperations;
 	}
 
 	@Override
@@ -54,7 +54,8 @@ public class GradleEnterpriseConventionsPlugin implements Plugin<Object> {
 	private void apply(Settings settings) {
 		settings.getPlugins().withType(GradleEnterprisePlugin.class, (plugin) -> {
 			GradleEnterpriseExtension extension = settings.getExtensions().getByType(GradleEnterpriseExtension.class);
-			extension.buildScan(this.buildScanConventions);
+			extension.buildScan(new BuildScanConventions(
+					new WorkingDirectoryProcessOperations(this.processOperations, settings.getRootDir())));
 		});
 		settings.buildCache(new BuildCacheConventions());
 	}
@@ -62,7 +63,9 @@ public class GradleEnterpriseConventionsPlugin implements Plugin<Object> {
 	private void apply(Project project) {
 		project.getPlugins().withId("com.gradle.build-scan", (plugin) -> {
 			BuildScanExtension buildScan = project.getExtensions().getByType(BuildScanExtension.class);
-			this.buildScanConventions.execute(buildScan);
+			new BuildScanConventions(
+					new WorkingDirectoryProcessOperations(this.processOperations, project.getRootDir()))
+							.execute(buildScan);
 		});
 	}
 
