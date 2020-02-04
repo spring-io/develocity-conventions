@@ -60,7 +60,9 @@ public class GradleEnterpriseConventionsPlugin implements Plugin<Object> {
 			configureBuildScanConventions(extension.getBuildScan(), settings.getStartParameter(),
 					settings.getRootDir());
 		});
-		settings.buildCache(new BuildCacheConventions());
+		if (settings.getStartParameter().isBuildCacheEnabled()) {
+			settings.buildCache(new BuildCacheConventions());
+		}
 	}
 
 	private void apply(Project project) {

@@ -50,11 +50,26 @@ class GradleEnterpriseConventionsPluginIntegrationTests {
 	}
 
 	@Test
+	void givenGradle6WhenThePluginIsAppliedThenBuildCacheConventionsAreApplied(@TempDir File projectDir) {
+		prepareGradle6Project(projectDir);
+		BuildResult result = build(projectDir, "6.0.1", "verifyBuildCacheConfig");
+		assertThat(result.getOutput()).contains("Build cache remote: https://ge.spring.io/cache/");
+	}
+
+	@Test
 	void givenGradle6WhenThePluginIsAppliedAndBuildScansAreDisabledThenBuildScanConventionsAreNotApplied(
 			@TempDir File projectDir) {
 		prepareGradle6Project(projectDir);
 		BuildResult result = build(projectDir, "6.0.1", "verifyBuildScanConfig", "--no-scan");
 		assertThat(result.getOutput()).contains("Build scan server: null");
+	}
+
+	@Test
+	void givenGradle6WhenThePluginIsAppliedAndBuildCacheIsDisabledThenBuildCacheConventionsAreNotApplied(
+			@TempDir File projectDir) {
+		prepareGradle6Project(projectDir);
+		BuildResult result = build(projectDir, "6.0.1", "verifyBuildCacheConfig", "--no-build-cache");
+		assertThat(result.getOutput()).contains("Build cache remote: null");
 	}
 
 	@Test
@@ -87,16 +102,26 @@ class GradleEnterpriseConventionsPluginIntegrationTests {
 	}
 
 	private void prepareGradle6Project(File projectDir) {
+		write(new File(projectDir, "gradle.properties"), (writer) -> {
+			writer.println("org.gradle.caching=true");
+		});
 		write(new File(projectDir, "settings.gradle"), (writer) -> {
 			writer.println("plugins {");
 			writer.println("    id 'com.gradle.enterprise' version '3.1.1'");
 			writer.println("    id 'io.spring.gradle-enterprise-conventions' version '" + version() + "'");
 			writer.println("}");
+			writer.println("gradle.afterProject { project -> project.ext['settings'] = settings }");
 		});
 		write(new File(projectDir, "build.gradle"), (writer) -> {
 			writer.println("task verifyBuildScanConfig {");
 			writer.println("    doFirst {");
 			writer.println("        println \"Build scan server: ${buildScan.server}\"");
+			writer.println("    }");
+			writer.println("}");
+			writer.println("task verifyBuildCacheConfig {");
+			writer.println("    doFirst {");
+			writer.println(
+					"        println \"Build cache remote: ${project.ext['settings'].buildCache?.remote?.url}\"");
 			writer.println("    }");
 			writer.println("}");
 		});
