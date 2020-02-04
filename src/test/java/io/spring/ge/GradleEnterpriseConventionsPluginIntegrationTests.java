@@ -102,9 +102,7 @@ class GradleEnterpriseConventionsPluginIntegrationTests {
 	}
 
 	private void prepareGradle6Project(File projectDir) {
-		write(new File(projectDir, "gradle.properties"), (writer) -> {
-			writer.println("org.gradle.caching=true");
-		});
+		write(new File(projectDir, "gradle.properties"), (writer) -> writer.println("org.gradle.caching=true"));
 		write(new File(projectDir, "settings.gradle"), (writer) -> {
 			writer.println("plugins {");
 			writer.println("    id 'com.gradle.enterprise' version '3.1.1'");
