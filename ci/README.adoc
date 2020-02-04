@@ -11,22 +11,6 @@ NOTE: This assumes that you have CredHub integration configured with the appropr
 
 === Release
 
-To release a milestone:
-
-[source]
-----
-$ fly -t gradle-enterprise-conventions-plugin trigger-job -j gradle-enterprise-conventions-plugin/stage-milestone
-$ fly -t gradle-enterprise-conventions-plugin trigger-job -j gradle-enterprise-conventions-plugin/promote-milestone
-----
-
-To release an RC:
-
-[source]
-----
-$ fly -t gradle-enterprise-conventions-plugin trigger-job -j gradle-enterprise-conventions-plugin/stage-rc
-$ fly -t gradle-enterprise-conventions-plugin trigger-job -j gradle-enterprise-conventions-plugin/promote-rc
-----
-
 To release a GA:
 
 [source]

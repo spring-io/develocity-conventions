@@ -7,12 +7,7 @@ buildName=$( cat artifactory-repo/build-info.json | jq -r '.buildInfo.name' )
 buildNumber=$( cat artifactory-repo/build-info.json | jq -r '.buildInfo.number' )
 version=$( cat artifactory-repo/build-info.json | jq -r '.buildInfo.modules[0].id' | sed 's/.*:.*:\(.*\)/\1/' )
 
-
-if [[ $RELEASE_TYPE = "M" ]]; then
-	targetRepo="plugins-milestone-local"
-elif [[ $RELEASE_TYPE = "RC" ]]; then
-	targetRepo="plugins-milestone-local"
-elif [[ $RELEASE_TYPE = "RELEASE" ]]; then
+if [[ $RELEASE_TYPE = "RELEASE" ]]; then
 	targetRepo="plugins-release-local"
 else
 	echo "Unknown release type $RELEASE_TYPE" >&2; exit 1;

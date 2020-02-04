@@ -92,7 +92,7 @@ Jenkins is detected by looking for an environment variable named `JENKINS_URL`.
 ## Applying the plugin
 
 The plugin is published to http://repo.spring.io.
-Depending on the version you wish to use, it will be availble from the `plugins-snapshot`, `plugins-milestone`, or `plugins-release` repository.
+Depending on the version you wish to use, it will be availble from the `plugins-snapshot` or `plugins-release` repository.
 
 The first step in applying the plugin is to make the necessary repository available for plugin resolution.
 This is done by configuring a plugin management repository in `settings.gradle`, as shown in the following example:
