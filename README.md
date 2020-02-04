@@ -88,3 +88,49 @@ Concourse does not automatically set any environment variables in the build's co
 To work around this, an environment variable named `CI` can be set on the task.
 
 Jenkins is detected by looking for an environment variable named `JENKINS_URL`.
+
+## Applying the plugin
+
+The plugin is published to http://repo.spring.io.
+Depending on the version you wish to use, it will be availble from the `plugins-snapshot`, `plugins-milestone`, or `plugins-release` repository.
+
+The first step in applying the plugin is to make the necessary repository available for plugin resolution.
+This is done by configuring a plugin management repository in `settings.gradle`, as shown in the following example:
+
+```
+pluginManagement {
+	repositories {
+		gradlePluginPortal()
+		maven { url 'https://repo.spring.io/plugins-release' }
+	}
+}
+```
+
+In the example above, `gradlePluginPortal()` is declared to allow other plugins to continue to be resolved from the portal.
+The second step in applying the plugin depends on whether you are using Gradle 5 or 6.
+
+### Gradle 5.x
+
+The plugin should be applied in `build.gradle` of the root project, alongside the `com.gradle.build-scan` plugin:
+
+```
+plugins {
+	// …
+	id "com.gradle.build-scan" version "<<version>>"
+	id "io.spring.gradle-enterprise-conventions" version "<<version>>"
+	// …
+}
+```
+
+### Gradle 6.x
+
+The plugin should be applied in `settings.gradle`, alongside the `com.gradle.enterprise` plugin:
+
+```
+plugins {
+	// …
+	id "com.gradle.enterprise" version "<<version>>"
+	id "io.spring.gradle-enterprise-conventions" version "<<version>>"
+	// …
+}
+```
