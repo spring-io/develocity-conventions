@@ -24,6 +24,7 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import com.gradle.scan.plugin.BuildScanExtension;
+import com.gradle.scan.plugin.internal.api.BuildScanExtensionWithHiddenFeatures;
 import org.gradle.api.Action;
 import org.gradle.api.GradleException;
 import org.gradle.api.internal.ProcessOperations;
@@ -57,12 +58,7 @@ class BuildScanConventions implements Action<BuildScanExtension> {
 		buildScan.getObfuscation().ipAddresses(
 				(addresses) -> addresses.stream().map((address) -> "0.0.0.0").collect(Collectors.toList()));
 		buildScan.publishAlways();
-		try {
-			buildScan.getClass().getMethod("publishIfAuthenticated").invoke(buildScan);
-		}
-		catch (Exception ex) {
-			throw new GradleException("Failed to enable publishIfAuthenticated", ex);
-		}
+		((BuildScanExtensionWithHiddenFeatures) buildScan).publishIfAuthenticated();
 		buildScan.setServer("https://ge.spring.io");
 		tagBuildScan(buildScan);
 		buildScan.background(this::addGitMetadata);
