@@ -32,6 +32,7 @@ import com.gradle.scan.plugin.BuildResult;
 import com.gradle.scan.plugin.BuildScanDataObfuscation;
 import com.gradle.scan.plugin.BuildScanExtension;
 import com.gradle.scan.plugin.PublishedBuildScan;
+import com.gradle.scan.plugin.internal.api.BuildScanExtensionWithHiddenFeatures;
 import org.gradle.api.Action;
 import org.gradle.api.internal.ProcessOperations;
 import org.gradle.process.ExecResult;
@@ -180,7 +181,7 @@ class BuildScanConventionsTests {
 		assertThat(this.buildScan.values).containsEntry("Git status", "M build.gradle");
 	}
 
-	public static final class TestBuildScanExtension implements BuildScanExtension {
+	public static final class TestBuildScanExtension implements BuildScanExtensionWithHiddenFeatures {
 
 		private final TestBuildScanDataObfuscation obfuscation = new TestBuildScanDataObfuscation();
 
@@ -254,10 +255,16 @@ class BuildScanConventionsTests {
 		}
 
 		@Override
+		public void onError(Action<String> action) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
 		public void publishAlways() {
 			this.publishAlways = true;
 		}
 
+		@Override
 		public void publishIfAuthenticated() {
 			this.publishIfAuthenticated = true;
 		}
