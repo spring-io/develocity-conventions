@@ -26,7 +26,6 @@ import java.util.stream.Collectors;
 import com.gradle.scan.plugin.BuildScanExtension;
 import com.gradle.scan.plugin.internal.api.BuildScanExtensionWithHiddenFeatures;
 import org.gradle.api.Action;
-import org.gradle.api.GradleException;
 import org.gradle.api.internal.ProcessOperations;
 
 /**
