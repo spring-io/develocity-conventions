@@ -62,6 +62,12 @@ class BuildScanConventions implements Action<BuildScanExtension> {
 		tagBuildScan(buildScan);
 		buildScan.background(this::addGitMetadata);
 		addCiMetadata(buildScan);
+		try {
+			buildScan.setUploadInBackground(!isCi());
+		}
+		catch (NoSuchMethodError ex) {
+			// GE Plugin version < 3.3. Continue
+		}
 	}
 
 	private void tagBuildScan(BuildScanExtension buildScan) {

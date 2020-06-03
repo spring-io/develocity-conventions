@@ -14,8 +14,13 @@ group = 'io.spring.gradle'
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
+configurations {
+	compatibilityTestImplementation
+}
+
 dependencies {
 	checkstyle("io.spring.javaformat:spring-javaformat-checkstyle:${javaFormatVersion}")
+	compatibilityTestImplementation("com.gradle:gradle-enterprise-gradle-plugin:3.1.1")
 	compileOnly("com.gradle:gradle-enterprise-gradle-plugin:${gradleEnterprisePluginVersion}")
 	testImplementation("com.gradle:gradle-enterprise-gradle-plugin:${gradleEnterprisePluginVersion}")
 	testImplementation("org.assertj:assertj-core:3.11.1")
@@ -53,6 +58,17 @@ tasks.withType(GenerateModuleMetadata).all {
 	enabled = false
 }
 
-test {
+tasks.withType(Test).all {
 	useJUnitPlatform()
+}
+
+task compatibilityTest(type: Test) {
+	classpath = configurations.compatibilityTestImplementation + test.classpath
+	filter {
+		includeTestsMatching "*IntegrationTests"
+	}
+}
+
+check {
+	dependsOn compatibilityTest
 }

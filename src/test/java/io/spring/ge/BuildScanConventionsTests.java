@@ -181,6 +181,18 @@ class BuildScanConventionsTests {
 		assertThat(this.buildScan.values).containsEntry("Git status", "M build.gradle");
 	}
 
+	@Test
+	void whenBuildingLocallyThenBackgroundUploadIsEnabled() {
+		new BuildScanConventions(this.processOperations).execute(this.buildScan);
+		assertThat(this.buildScan.uploadInBackground).isTrue();
+	}
+
+	@Test
+	void whenBuildingOnCiThenBackgroundUploadIsDisabled() {
+		new BuildScanConventions(this.processOperations, Collections.singletonMap("CI", null)).execute(this.buildScan);
+		assertThat(this.buildScan.uploadInBackground).isFalse();
+	}
+
 	public static final class TestBuildScanExtension implements BuildScanExtensionWithHiddenFeatures {
 
 		private final TestBuildScanDataObfuscation obfuscation = new TestBuildScanDataObfuscation();
@@ -198,6 +210,8 @@ class BuildScanConventionsTests {
 		private boolean publishIfAuthenticated;
 
 		private String server;
+
+		private boolean uploadInBackground = true;
 
 		@Override
 		public void background(Action<? super BuildScanExtension> action) {
@@ -317,6 +331,16 @@ class BuildScanConventionsTests {
 		@Override
 		public void value(String name, String value) {
 			this.values.put(name, value);
+		}
+
+		@Override
+		public boolean isUploadInBackground() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public void setUploadInBackground(boolean uploadInBackground) {
+			this.uploadInBackground = uploadInBackground;
 		}
 
 	}
