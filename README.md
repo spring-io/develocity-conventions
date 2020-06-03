@@ -50,6 +50,7 @@ The build scans will be customized to:
  - Add links:
     - `CI build` when building on Bamboo or Jenkins, linking to the build on the CI server.
     - `Git commit build scans`, linking to scans for other builds of the same git commit.
+ - Enable capturing of task input files
  - Upload build scans in the foreground when running on CI
 
 ### Build scan publishing credentials
