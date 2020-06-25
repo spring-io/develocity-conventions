@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.spring.ge;
+package io.spring.ge.gradle;
 
 import java.io.File;
 

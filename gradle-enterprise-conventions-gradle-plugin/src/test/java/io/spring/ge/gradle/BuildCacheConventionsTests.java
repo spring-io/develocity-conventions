@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.spring.ge;
+package io.spring.ge.gradle;
 
 import java.net.URI;
 import java.util.HashMap;

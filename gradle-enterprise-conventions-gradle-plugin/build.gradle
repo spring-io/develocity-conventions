@@ -15,6 +15,7 @@ configurations {
 }
 
 dependencies {
+	implementation(project(":gradle-enterprise-conventions-core"))
 	compatibilityTestImplementation("com.gradle:gradle-enterprise-gradle-plugin:3.1.1")
 	compileOnly("com.gradle:gradle-enterprise-gradle-plugin:${gradleEnterprisePluginVersion}")
 	testImplementation("com.gradle:gradle-enterprise-gradle-plugin:${gradleEnterprisePluginVersion}")
@@ -24,7 +25,7 @@ gradlePlugin {
 	plugins {
 		gradleEnterprisePlugin {
 			id = 'io.spring.gradle-enterprise-conventions'
-			implementationClass = 'io.spring.ge.GradleEnterpriseConventionsPlugin'
+			implementationClass = 'io.spring.ge.gradle.GradleEnterpriseConventionsPlugin'
 		}
 	}
 }

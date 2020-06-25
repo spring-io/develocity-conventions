@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.spring.ge;
+package io.spring.ge.gradle;
 
 import java.io.File;
 import java.io.FileReader;
@@ -28,6 +28,7 @@ import java.util.Properties;
 import java.util.function.Consumer;
 
 import com.gradle.enterprise.gradleplugin.GradleEnterprisePlugin;
+import io.spring.ge.core.ConfigurableBuildScan;
 import org.gradle.testkit.runner.BuildResult;
 import org.gradle.testkit.runner.GradleRunner;
 import org.junit.jupiter.api.Test;
@@ -148,6 +149,7 @@ class GradleEnterpriseConventionsPluginIntegrationTests {
 	private BuildResult build(File projectDir, String gradleVersion, String... arguments) {
 		List<File> classpath = Arrays.asList(new File("bin/main"), new File("build/classes/java/main"),
 				new File("build/resources/main"),
+				new File(ConfigurableBuildScan.class.getProtectionDomain().getCodeSource().getLocation().getFile()),
 				new File(GradleEnterprisePlugin.class.getProtectionDomain().getCodeSource().getLocation().getFile()));
 		return GradleRunner.create().withGradleVersion(gradleVersion).withProjectDir(projectDir)
 				.withPluginClasspath(classpath).withArguments(arguments).build();

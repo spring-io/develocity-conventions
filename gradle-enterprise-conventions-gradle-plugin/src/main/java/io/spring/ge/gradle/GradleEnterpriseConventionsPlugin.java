@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.spring.ge;
+package io.spring.ge.gradle;
 
 import java.io.File;
 
@@ -23,6 +23,7 @@ import javax.inject.Inject;
 import com.gradle.enterprise.gradleplugin.GradleEnterpriseExtension;
 import com.gradle.enterprise.gradleplugin.GradleEnterprisePlugin;
 import com.gradle.scan.plugin.BuildScanExtension;
+import io.spring.ge.core.BuildScanConventions;
 import org.gradle.StartParameter;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
@@ -74,8 +75,9 @@ public class GradleEnterpriseConventionsPlugin implements Plugin<Object> {
 	private void configureBuildScanConventions(BuildScanExtension buildScan, StartParameter startParameter,
 			File rootDir) {
 		if (!startParameter.isNoBuildScan()) {
-			new BuildScanConventions(new WorkingDirectoryProcessOperations(this.processOperations, rootDir))
-					.execute(buildScan);
+			new BuildScanConventions(new ProcessOperationsProcessRunner(
+					new WorkingDirectoryProcessOperations(this.processOperations, rootDir)))
+							.execute(new GradleConfigurableBuildScan(buildScan));
 		}
 	}
 

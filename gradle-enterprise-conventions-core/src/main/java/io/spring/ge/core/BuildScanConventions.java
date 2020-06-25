@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.spring.ge;
+package io.spring.ge.core;
 
 import java.io.ByteArrayOutputStream;
 import java.io.UnsupportedEncodingException;
@@ -23,60 +23,52 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-import com.gradle.scan.plugin.BuildScanExtension;
-import com.gradle.scan.plugin.internal.api.BuildScanExtensionWithHiddenFeatures;
-import org.gradle.api.Action;
-import org.gradle.api.internal.ProcessOperations;
-
 /**
- * {@link Action} that configures the {@link BuildScanExtension build scan} with Spring
- * conventions.
+ * Conventions that are applied to build scans for Maven and Gradle builds.
  *
  * @author Andy Wilkinson
  */
-class BuildScanConventions implements Action<BuildScanExtension> {
+public class BuildScanConventions {
 
 	private static final String BAMBOO_RESULTS_ENV_VAR = "bamboo_resultsUrl";
 
 	private final Map<String, String> env;
 
-	private final ProcessOperations processOperations;
+	private final ProcessRunner processRunner;
 
-	BuildScanConventions(ProcessOperations processOperations) {
-		this(processOperations, System.getenv());
+	public BuildScanConventions(ProcessRunner processRunner) {
+		this(processRunner, System.getenv());
 	}
 
-	BuildScanConventions(ProcessOperations execOperations, Map<String, String> env) {
-		this.processOperations = execOperations;
+	public BuildScanConventions(ProcessRunner processRunner, Map<String, String> env) {
+		this.processRunner = processRunner;
 		this.env = env;
 	}
 
-	@Override
-	public void execute(BuildScanExtension buildScan) {
-		buildScan.setCaptureTaskInputFiles(true);
-		buildScan.getObfuscation().ipAddresses(
-				(addresses) -> addresses.stream().map((address) -> "0.0.0.0").collect(Collectors.toList()));
+	/**
+	 * Applies the conventions to the given {@code buildScan}.
+	 * @param buildScan build scan to be configured
+	 */
+	public void execute(ConfigurableBuildScan buildScan) {
+		buildScan.captureInputFiles(true);
+		buildScan.obfuscation((obfuscation) -> obfuscation.ipAddresses(
+				(addresses) -> addresses.stream().map((address) -> "0.0.0.0").collect(Collectors.toList())));
 		buildScan.publishAlways();
-		((BuildScanExtensionWithHiddenFeatures) buildScan).publishIfAuthenticated();
-		buildScan.setServer("https://ge.spring.io");
+		buildScan.publishIfAuthenticated();
+		buildScan.server("https://ge.spring.io");
 		tagBuildScan(buildScan);
 		buildScan.background(this::addGitMetadata);
 		addCiMetadata(buildScan);
-		try {
-			buildScan.setUploadInBackground(!isCi());
-		}
-		catch (NoSuchMethodError ex) {
-			// GE Plugin version < 3.3. Continue
-		}
+		buildScan.uploadInBackground(!isCi());
 	}
 
-	private void tagBuildScan(BuildScanExtension buildScan) {
+	private void tagBuildScan(ConfigurableBuildScan buildScan) {
 		tagCiOrLocal(buildScan);
 		tagJdk(buildScan);
 		tagOperatingSystem(buildScan);
 	}
 
-	private void tagCiOrLocal(BuildScanExtension buildScan) {
+	private void tagCiOrLocal(ConfigurableBuildScan buildScan) {
 		buildScan.tag(isCi() ? "CI" : "Local");
 	}
 
@@ -99,32 +91,31 @@ class BuildScanConventions implements Action<BuildScanExtension> {
 		return this.env.containsKey("JENKINS_URL");
 	}
 
-	private void tagJdk(BuildScanExtension buildScan) {
+	private void tagJdk(ConfigurableBuildScan buildScan) {
 		buildScan.tag("JDK-" + System.getProperty("java.specification.version"));
 	}
 
-	private void tagOperatingSystem(BuildScanExtension buildScan) {
+	private void tagOperatingSystem(ConfigurableBuildScan buildScan) {
 		buildScan.tag(System.getProperty("os.name"));
 	}
 
-	private void addGitMetadata(BuildScanExtension buildScan) {
-		exec("git", "rev-parse", "--short=8", "--verify", "HEAD").standardOut((gitCommitId) -> {
+	private void addGitMetadata(ConfigurableBuildScan buildScan) {
+		run("git", "rev-parse", "--short=8", "--verify", "HEAD").standardOut((gitCommitId) -> {
 			String commitIdLabel = "Git commit";
 			buildScan.value(commitIdLabel, gitCommitId);
-			buildScan.link("Git commit build scans",
-					buildScan.getServer() + createSearchUrl(commitIdLabel, gitCommitId));
+			buildScan.link("Git commit build scans", buildScan.server() + createSearchUrl(commitIdLabel, gitCommitId));
 		});
 		getBranch().standardOut((gitBranchName) -> {
 			buildScan.tag(gitBranchName);
 			buildScan.value("Git branch", gitBranchName);
 		});
-		exec("git", "status", "--porcelain").standardOut((gitStatus) -> {
+		run("git", "status", "--porcelain").standardOut((gitStatus) -> {
 			buildScan.tag("dirty");
 			buildScan.value("Git status", gitStatus);
 		});
 	}
 
-	private void addCiMetadata(BuildScanExtension buildScan) {
+	private void addCiMetadata(ConfigurableBuildScan buildScan) {
 		if (isBamboo()) {
 			buildScan.link("CI build", this.env.get(BAMBOO_RESULTS_ENV_VAR));
 		}
@@ -136,12 +127,12 @@ class BuildScanConventions implements Action<BuildScanExtension> {
 		}
 	}
 
-	private ExecResult getBranch() {
+	private RunResult getBranch() {
 		String branch = this.env.get("BRANCH");
 		if (branch != null) {
-			return new ExecResult(branch);
+			return new RunResult(branch);
 		}
-		return exec("git", "rev-parse", "--abbrev-ref", "HEAD");
+		return run("git", "rev-parse", "--abbrev-ref", "HEAD");
 	}
 
 	private String createSearchUrl(String name, String value) {
@@ -157,24 +148,24 @@ class BuildScanConventions implements Action<BuildScanExtension> {
 		}
 	}
 
-	private ExecResult exec(Object... commandLine) {
+	private RunResult run(Object... commandLine) {
 		ByteArrayOutputStream standardOutput = new ByteArrayOutputStream();
-		this.processOperations.exec((spec) -> {
-			spec.setCommandLine(commandLine);
-			spec.setStandardOutput(standardOutput);
+		this.processRunner.run((spec) -> {
+			spec.commandLine(commandLine);
+			spec.standardOutput(standardOutput);
 		});
-		return new ExecResult(standardOutput.toString().trim());
+		return new RunResult(standardOutput.toString().trim());
 	}
 
 	private boolean hasText(String string) {
 		return string != null && string.length() > 0;
 	}
 
-	private static final class ExecResult {
+	private static final class RunResult {
 
 		private final String standardOutput;
 
-		private ExecResult(String standardOutput) {
+		private RunResult(String standardOutput) {
 			this.standardOutput = standardOutput;
 		}
 
