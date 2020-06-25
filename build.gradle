@@ -1,74 +1,43 @@
-plugins {
-	id "checkstyle"
-	id "io.spring.javaformat" version "$javaFormatVersion"
-	id "java-gradle-plugin"
-	id "maven-publish"
+allprojects {
+	group = 'io.spring.ge'	
 }
 
-repositories {
-	mavenCentral()
-	gradlePluginPortal()
-}
-
-group = 'io.spring.gradle'
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
-
-configurations {
-	compatibilityTestImplementation
-}
-
-dependencies {
-	checkstyle("io.spring.javaformat:spring-javaformat-checkstyle:${javaFormatVersion}")
-	compatibilityTestImplementation("com.gradle:gradle-enterprise-gradle-plugin:3.1.1")
-	compileOnly("com.gradle:gradle-enterprise-gradle-plugin:${gradleEnterprisePluginVersion}")
-	testImplementation("com.gradle:gradle-enterprise-gradle-plugin:${gradleEnterprisePluginVersion}")
-	testImplementation("org.assertj:assertj-core:3.11.1")
-	testImplementation("org.junit.jupiter:junit-jupiter:5.6.0")
-	testImplementation("org.mockito:mockito-core:3.2.4")
-}
-
-checkstyle {
-	def archive = configurations.checkstyle.filter { it.name.startsWith("spring-javaformat-checkstyle")}
-	config = resources.text.fromArchiveEntry(archive, "io/spring/javaformat/checkstyle/checkstyle.xml")
-	toolVersion = 8.28
-}
-
-gradlePlugin {
-	plugins {
-		gradleEnterprisePlugin {
-			id = 'io.spring.gradle-enterprise-conventions'
-			implementationClass = 'io.spring.ge.GradleEnterpriseConventionsPlugin'
+subprojects {
+	plugins.withType(JavaPlugin) {
+		sourceCompatibility = 1.8
+		targetCompatibility = 1.8	
+		dependencies {
+			testImplementation("org.assertj:assertj-core:3.11.1")
+			testImplementation("org.junit.jupiter:junit-jupiter:5.6.0")
+			testImplementation("org.mockito:mockito-core:3.2.4")
+		}
+		tasks.withType(Test).all {
+			useJUnitPlatform()
 		}
 	}
-}
-
-if (project.hasProperty("distributionRepository")) {
-	publishing {
-		repositories {
-			maven {
-				url = "${distributionRepository}"
-				name = "deployment"
+	plugins.withType(CheckstylePlugin) {
+		dependencies {
+			checkstyle("io.spring.javaformat:spring-javaformat-checkstyle:${javaFormatVersion}")	
+		}
+		checkstyle {
+			def archive = configurations.checkstyle.filter { it.name.startsWith("spring-javaformat-checkstyle")}
+			config = resources.text.fromArchiveEntry(archive, "io/spring/javaformat/checkstyle/checkstyle.xml")
+			toolVersion = 8.28
+		}
+	}
+	plugins.withType(MavenPublishPlugin) {
+		tasks.withType(GenerateModuleMetadata).all {
+			enabled = false
+		}
+		if (project.hasProperty("distributionRepository")) {
+			publishing {
+				repositories {
+					maven {
+						url = "${distributionRepository}"
+						name = "deployment"
+					}
+				}
 			}
 		}
 	}
-}
-
-tasks.withType(GenerateModuleMetadata).all {
-	enabled = false
-}
-
-tasks.withType(Test).all {
-	useJUnitPlatform()
-}
-
-task compatibilityTest(type: Test) {
-	classpath = configurations.compatibilityTestImplementation + test.classpath
-	filter {
-		includeTestsMatching "*IntegrationTests"
-	}
-}
-
-check {
-	dependsOn compatibilityTest
 }

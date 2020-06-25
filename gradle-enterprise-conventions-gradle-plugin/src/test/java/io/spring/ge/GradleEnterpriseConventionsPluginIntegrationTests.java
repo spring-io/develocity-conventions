@@ -136,8 +136,8 @@ class GradleEnterpriseConventionsPluginIntegrationTests {
 
 	private String version() {
 		Properties properties = new Properties();
-		try (Reader reader = new FileReader("gradle.properties")) {
-			properties.load(new FileReader("gradle.properties"));
+		try (Reader reader = new FileReader("../gradle.properties")) {
+			properties.load(reader);
 			return properties.getProperty("version");
 		}
 		catch (IOException ex) {

@@ -12,4 +12,6 @@ pluginManagement {
 	}
 }
 
-rootProject.name = 'gradle-enterprise-conventions-plugin'
+rootProject.name = 'gradle-enterprise-conventions'
+
+include ":gradle-enterprise-conventions-gradle-plugin"

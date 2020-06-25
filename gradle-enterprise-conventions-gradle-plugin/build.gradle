@@ -1,0 +1,41 @@
+plugins {
+	id "checkstyle"
+	id "io.spring.javaformat" version "$javaFormatVersion"
+	id "java-gradle-plugin"
+	id "maven-publish"
+}
+
+repositories {
+	mavenCentral()
+	gradlePluginPortal()
+}
+
+configurations {
+	compatibilityTestImplementation
+}
+
+dependencies {
+	compatibilityTestImplementation("com.gradle:gradle-enterprise-gradle-plugin:3.1.1")
+	compileOnly("com.gradle:gradle-enterprise-gradle-plugin:${gradleEnterprisePluginVersion}")
+	testImplementation("com.gradle:gradle-enterprise-gradle-plugin:${gradleEnterprisePluginVersion}")
+}
+
+gradlePlugin {
+	plugins {
+		gradleEnterprisePlugin {
+			id = 'io.spring.gradle-enterprise-conventions'
+			implementationClass = 'io.spring.ge.GradleEnterpriseConventionsPlugin'
+		}
+	}
+}
+
+task compatibilityTest(type: Test) {
+	classpath = configurations.compatibilityTestImplementation + test.classpath
+	filter {
+		includeTestsMatching "*IntegrationTests"
+	}
+}
+
+check {
+	dependsOn compatibilityTest
+}
