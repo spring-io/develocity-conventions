@@ -16,8 +16,8 @@ resources:
 - name: github-release
   type: github-release
   source:
-    owner: spring-gradle-plugins
-    repository: gradle-enterprise-conventions-plugin
+    owner: spring-io
+    repository: gradle-enterprise-conventions
     access_token: ((github-release-notes-access-token))
     pre_release: false
 - name: ci-image-git-repo
@@ -29,7 +29,7 @@ resources:
 - name: ci-image
   type: docker-image
   source:
-    repository: ((docker-hub-organization))/gradle-enterprise-conventions-plugin-ci-image
+    repository: ((docker-hub-organization))/gradle-enterprise-conventions-ci-image
     username: ((docker-hub-username))
     password: ((docker-hub-password))
     tag: ((branch))
@@ -63,7 +63,7 @@ jobs:
       file: git-repo/ci/tasks/build-project.yml
   - put: artifactory-repo
     params: &artifactory-params
-      repo: plugins-snapshot-local
+      repo: libs-snapshot-local
       build_number: "${BUILD_ID}"
       folder: distribution-repository
       build_uri: "https://ci.spring.io/teams/${BUILD_TEAM_NAME}/pipelines/${BUILD_PIPELINE_NAME}/jobs/${BUILD_JOB_NAME}/builds/${BUILD_NAME}"

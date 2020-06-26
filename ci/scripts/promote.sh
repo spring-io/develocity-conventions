@@ -8,7 +8,7 @@ buildNumber=$( cat artifactory-repo/build-info.json | jq -r '.buildInfo.number' 
 version=$( cat artifactory-repo/build-info.json | jq -r '.buildInfo.modules[0].id' | sed 's/.*:.*:\(.*\)/\1/' )
 
 if [[ $RELEASE_TYPE = "RELEASE" ]]; then
-	targetRepo="plugins-release-local"
+	targetRepo="libs-release-local"
 else
 	echo "Unknown release type $RELEASE_TYPE" >&2; exit 1;
 fi
