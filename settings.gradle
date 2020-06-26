@@ -16,3 +16,4 @@ rootProject.name = 'gradle-enterprise-conventions'
 
 include ":gradle-enterprise-conventions-core"
 include ":gradle-enterprise-conventions-gradle-plugin"
+include ":gradle-enterprise-conventions-maven-extension"

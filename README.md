@@ -1,12 +1,10 @@
-# Gradle Enterprise Conventions Plugin
+# Gradle Enterprise Conventions
 
-A Gradle plugin for configuring projects to use the Gradle Enterprise instance hosted at [ge.spring.io](https://ge.spring.io).
+Conventions for Maven and Gradle projects that use the Gradle Enterprise instance hosted at [ge.spring.io](https://ge.spring.io).
 
 ## Build cache conventions
 
-Configuring build cache conventions requires Gradle 6.0 or later.
-
-When applied as a settings plugin and the build cache is enabled (`org.gradle.caching=true` in `gradle.properties`), the plugin will configure the build cache to:
+When applied, the conventions will configure the build cache to:
 
 - Enable local caching.
 - Use https://ge.spring.io/cache/ as the remote cache.
@@ -50,7 +48,7 @@ The build scans will be customized to:
  - Add links:
     - `CI build` when building on Bamboo or Jenkins, linking to the build on the CI server.
     - `Git commit build scans`, linking to scans for other builds of the same git commit.
- - Enable capturing of task input files
+ - Enable capturing of task (Gradle) or goal (Maven) input files
  - Upload build scans in the foreground when running on CI
 
 ### Build scan publishing credentials
@@ -91,19 +89,21 @@ To work around this, an environment variable named `CI` can be set on the task.
 
 Jenkins is detected by looking for an environment variable named `JENKINS_URL`.
 
-## Applying the plugin
+## Using the conventions
 
-The plugin is published to http://repo.spring.io.
-Depending on the version you wish to use, it will be availble from the `plugins-snapshot` or `plugins-release` repository.
+The conventions are published to https://repo.spring.io.
+Depending on the version you wish to use, they will be availble from the `snapshot` or `release` repository.
 
-The first step in applying the plugin is to make the necessary repository available for plugin resolution.
+### Gradle
+
+The first step in using the conventions is to make the necessary repository available for plugin resolution.
 This is done by configuring a plugin management repository in `settings.gradle`, as shown in the following example:
 
-```
+```groovy
 pluginManagement {
 	repositories {
 		gradlePluginPortal()
-		maven { url 'https://repo.spring.io/plugins-release' }
+		maven { url 'https://repo.spring.io/release' }
 	}
 }
 ```
@@ -111,11 +111,11 @@ pluginManagement {
 In the example above, `gradlePluginPortal()` is declared to allow other plugins to continue to be resolved from the portal.
 The second step in applying the plugin depends on whether you are using Gradle 5 or 6.
 
-### Gradle 5.x
+#### Gradle 5.x
 
 The plugin should be applied in `build.gradle` of the root project, alongside the `com.gradle.build-scan` plugin:
 
-```
+```groovy
 plugins {
 	// …
 	id "com.gradle.build-scan" version "<<version>>"
@@ -124,15 +124,34 @@ plugins {
 }
 ```
 
-### Gradle 6.x
+#### Gradle 6.x
 
 The plugin should be applied in `settings.gradle`, alongside the `com.gradle.enterprise` plugin:
 
-```
+```groovy
 plugins {
 	// …
 	id "com.gradle.enterprise" version "<<version>>"
 	id "io.spring.gradle-enterprise-conventions" version "<<version>>"
 	// …
 }
+```
+
+### Maven
+
+To use the conventions, configure both the Gradle Enterprise and the Conventions Maven extensions in `.mvn/extensions.xml`, as showing in the following example:
+
+```xml
+<extensions>
+    <extension>
+        <groupId>com.gradle</groupId>
+        <artifactId>gradle-enterprise-maven-extension</artifactId>
+        <version><<version>></version>
+    </extension>
+    <extension>
+        <groupId>io.spring.ge</groupId>
+        <artifactId>gradle-enterprise-conventions-maven-extension</artifactId>
+        <version><<version>></version>
+    </extension>
+</extensions>
 ```
