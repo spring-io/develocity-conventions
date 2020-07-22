@@ -6,13 +6,11 @@ inputs:
 outputs:
 - name: version
 params:
-  RELEASE_TYPE:
-  ARTIFACTORY_SERVER:
-  ARTIFACTORY_USERNAME:
-  ARTIFACTORY_PASSWORD:
-  BINTRAY_SUBJECT:
   BINTRAY_REPO:
+  BINTRAY_SUBJECT:
   BINTRAY_USERNAME:
   BINTRAY_API_KEY:
+  SONATYPE_USER_TOKEN:
+  SONATYPE_PASSWORD_TOKEN:
 run:
-  path: git-repo/ci/scripts/promote.sh
+  path: git-repo/ci/scripts/sync-to-maven-central.sh
