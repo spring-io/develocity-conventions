@@ -47,7 +47,7 @@ subprojects {
 			publications {
 				withType(MavenPublication) { mavenPublication -> 
 					pom {
-						name = "${project.group}:${project.name}"
+						name = project.description
 						description = project.description
                 		url = 'https://github.com/spring-io/gradle-enterprise-conventions'
                 		organization {

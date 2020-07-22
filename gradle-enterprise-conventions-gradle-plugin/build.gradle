@@ -5,6 +5,8 @@ plugins {
 	id "maven-publish"
 }
 
+description = "Gradle Enterprise Conventions Gradle plugin"
+
 repositories {
 	mavenCentral()
 	gradlePluginPortal()
@@ -24,8 +26,8 @@ dependencies {
 gradlePlugin {
 	plugins {
 		gradleEnterprisePlugin {
-			displayName = "Gradle Enterprise Conventions Gradle plugin"
-			description = "Gradle Enterprise Conventions Gradle plugin"
+			displayName = project.description
+			description = project.description
 			id = 'io.spring.gradle-enterprise-conventions'
 			implementationClass = 'io.spring.ge.gradle.GradleEnterpriseConventionsPlugin'
 		}
