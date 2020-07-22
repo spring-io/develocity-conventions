@@ -92,7 +92,7 @@ class GradleEnterpriseConventionsPluginIntegrationTests {
 		write(new File(projectDir, "build.gradle"), (writer) -> {
 			writer.println("plugins {");
 			writer.println("    id 'com.gradle.build-scan'");
-			writer.println("    id 'io.spring.gradle-enterprise-conventions' version '" + version() + "'");
+			writer.println("    id 'io.spring.ge.conventions' version '" + version() + "'");
 			writer.println("}");
 			writer.println("task verifyBuildScanConfig {");
 			writer.println("    doFirst {");
@@ -107,7 +107,7 @@ class GradleEnterpriseConventionsPluginIntegrationTests {
 		write(new File(projectDir, "settings.gradle"), (writer) -> {
 			writer.println("plugins {");
 			writer.println("    id 'com.gradle.enterprise'");
-			writer.println("    id 'io.spring.gradle-enterprise-conventions' version '" + version() + "'");
+			writer.println("    id 'io.spring.ge.conventions' version '" + version() + "'");
 			writer.println("}");
 			writer.println("gradle.afterProject { project -> project.ext['settings'] = settings }");
 		});
