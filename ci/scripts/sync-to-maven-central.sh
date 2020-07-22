@@ -11,7 +11,7 @@ echo "Syncing ${buildName}/${buildNumber} to Maven Central"
 			-s \
 			-o /dev/null \
 			-I \
-			-w "%{http_code}"
+			-w "%{http_code}" \
 			"https://oss.sonatype.org/service/local/repositories/releases/content/io/spring/ge/gradle-enterprise-conventions-core/${version}/gradle-enterprise-conventions-core-${version}.jar.sha1")
 
 	if [ ${publishStatus} == "200" ]; then
