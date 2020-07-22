@@ -5,6 +5,8 @@ plugins {
 	id "maven-publish"
 }
 
+description = "Gradle Enterprise Conventions Maven extension"
+
 repositories {
 	mavenCentral()
 }
