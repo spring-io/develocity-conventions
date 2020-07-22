@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.spring.ge.maven;
+package io.spring.ge.conventions.gradle;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -23,41 +23,42 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import com.gradle.maven.extension.api.scan.BuildResult;
-import com.gradle.maven.extension.api.scan.BuildScanApi;
-import com.gradle.maven.extension.api.scan.BuildScanDataObfuscation;
-import com.gradle.maven.extension.api.scan.PublishedBuildScan;
+import com.gradle.scan.plugin.BuildResult;
+import com.gradle.scan.plugin.BuildScanDataObfuscation;
+import com.gradle.scan.plugin.BuildScanExtension;
+import com.gradle.scan.plugin.PublishedBuildScan;
+import com.gradle.scan.plugin.internal.api.BuildScanExtensionWithHiddenFeatures;
+import org.gradle.api.Action;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Tests for {@link MavenConfigurableBuildScan}.
+ * Tests for {@link GradleConfigurableBuildScan}.
  *
  * @author Andy Wilkinson
  */
-public class MavenConfigurableBuildScanTests {
+class GradleConfigurableBuildScanTests {
 
-	private final TestBuildScanApi api = new TestBuildScanApi();
+	private final TestBuildScanExtension extension = new TestBuildScanExtension();
 
-	private final MavenConfigurableBuildScan buildScan = new MavenConfigurableBuildScan(this.api);
+	private final GradleConfigurableBuildScan buildScan = new GradleConfigurableBuildScan(this.extension);
 
 	@Test
 	void capturingOfTaskInputsCanBeEnabled() {
 		this.buildScan.captureInputFiles(true);
-		assertThat(this.api.isCaptureGoalInputFiles()).isTrue();
+		assertThat(this.extension.isCaptureTaskInputFiles()).isTrue();
 	}
 
 	@Test
 	void ipAddressesCanBeObfuscated() throws UnknownHostException {
 		this.buildScan.obfuscation((obfuscation) -> obfuscation.ipAddresses(
 				(addresses) -> addresses.stream().map((address) -> "0.0.0.0").collect(Collectors.toList())));
-		assertThat(this.api.obfuscation.ipAddressesObfuscator).isNotNull();
-		List<String> obfuscatedAddresses = this.api.obfuscation.ipAddressesObfuscator
+		assertThat(this.extension.obfuscation.ipAddressesObfuscator).isNotNull();
+		List<String> obfuscatedAddresses = this.extension.obfuscation.ipAddressesObfuscator
 				.apply(Arrays.asList(InetAddress.getByName("10.0.0.1"), InetAddress.getByName("10.0.0.2")));
 		assertThat(obfuscatedAddresses).containsExactly("0.0.0.0", "0.0.0.0");
 	}
@@ -65,50 +66,56 @@ public class MavenConfigurableBuildScanTests {
 	@Test
 	void publishAlwaysCanBeEnabled() {
 		this.buildScan.publishAlways();
-		assertThat(this.api.publishAlways).isTrue();
+		assertThat(this.extension.publishAlways).isTrue();
+	}
+
+	@Test
+	void publishIfAuthenticatedCanBeEnabled() {
+		this.buildScan.publishIfAuthenticated();
+		assertThat(this.extension.publishIfAuthenticated).isTrue();
 	}
 
 	@Test
 	void serverCanBeConfigured() {
 		this.buildScan.server("https://ge.spring.io");
-		assertThat(this.api.server).isEqualTo("https://ge.spring.io");
+		assertThat(this.extension.server).isEqualTo("https://ge.spring.io");
 		assertThat(this.buildScan.server()).isEqualTo("https://ge.spring.io");
 	}
 
 	@Test
 	void linksCanBeAddedToTheBuildScan() {
 		this.buildScan.link("Example", "https://example.com");
-		assertThat(this.api.links).hasSize(1);
-		assertThat(this.api.links).containsEntry("Example", "https://example.com");
+		assertThat(this.extension.links).hasSize(1);
+		assertThat(this.extension.links).containsEntry("Example", "https://example.com");
 	}
 
 	@Test
 	void tagsCanBeAddedToTheBuildScan() {
 		this.buildScan.tag("JDK-1.8");
 		this.buildScan.tag("CI");
-		assertThat(this.api.tags).containsExactly("JDK-1.8", "CI");
+		assertThat(this.extension.tags).containsExactly("JDK-1.8", "CI");
 	}
 
 	@Test
 	void valuesCanBeAddedToTheBuildScan() {
 		this.buildScan.value("Git commit", "abcd1234");
-		assertThat(this.api.values).hasSize(1);
-		assertThat(this.api.values).containsEntry("Git commit", "abcd1234");
+		assertThat(this.extension.values).hasSize(1);
+		assertThat(this.extension.values).containsEntry("Git commit", "abcd1234");
 	}
 
 	@Test
 	void uploadInBackgroundCanBeDisabled() {
 		this.buildScan.uploadInBackground(false);
-		assertThat(this.api.uploadInBackground).isFalse();
+		assertThat(this.extension.uploadInBackground).isFalse();
 	}
 
 	@Test
 	void backgroundConfigurationIsPerformed() {
 		this.buildScan.background((scan) -> scan.server("https://background.example.com"));
-		assertThat(this.api.server).isEqualTo("https://background.example.com");
+		assertThat(this.extension.server).isEqualTo("https://background.example.com");
 	}
 
-	public static final class TestBuildScanApi implements BuildScanApi {
+	public static final class TestBuildScanExtension implements BuildScanExtensionWithHiddenFeatures {
 
 		private final TestBuildScanDataObfuscation obfuscation = new TestBuildScanDataObfuscation();
 
@@ -118,7 +125,7 @@ public class MavenConfigurableBuildScanTests {
 
 		private final Map<String, String> links = new HashMap<>();
 
-		private boolean captureGoalInputFiles;
+		private boolean captureTaskInputFiles;
 
 		private boolean publishAlways;
 
@@ -127,6 +134,21 @@ public class MavenConfigurableBuildScanTests {
 		private String server;
 
 		private boolean uploadInBackground = true;
+
+		@Override
+		public void background(Action<? super BuildScanExtension> action) {
+			action.execute(this);
+		}
+
+		@Override
+		public void buildFinished(Action<? super BuildResult> action) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public void buildScanPublished(Action<? super PublishedBuildScan> action) {
+			throw new UnsupportedOperationException();
+		}
 
 		@Override
 		public boolean getAllowUntrustedServer() {
@@ -154,13 +176,33 @@ public class MavenConfigurableBuildScanTests {
 		}
 
 		@Override
+		public boolean isCaptureTaskInputFiles() {
+			return this.captureTaskInputFiles;
+		}
+
+		@Override
 		public void link(String name, String url) {
 			this.links.put(name, url);
 		}
 
 		@Override
+		public void obfuscation(Action<? super BuildScanDataObfuscation> action) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public void onError(Action<String> action) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
 		public void publishAlways() {
 			this.publishAlways = true;
+		}
+
+		@Override
+		public void publishIfAuthenticated() {
+			this.publishIfAuthenticated = true;
 		}
 
 		@Override
@@ -181,6 +223,11 @@ public class MavenConfigurableBuildScanTests {
 		@Override
 		public void setAllowUntrustedServer(boolean allow) {
 			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public void setCaptureTaskInputFiles(boolean capture) {
+			this.captureTaskInputFiles = capture;
 		}
 
 		@Override
@@ -216,46 +263,6 @@ public class MavenConfigurableBuildScanTests {
 		@Override
 		public void setUploadInBackground(boolean uploadInBackground) {
 			this.uploadInBackground = uploadInBackground;
-		}
-
-		@Override
-		public void background(Consumer<? super BuildScanApi> action) {
-			action.accept(this);
-		}
-
-		@Override
-		public void buildFinished(Consumer<? super BuildResult> action) {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public void buildScanPublished(Consumer<? super PublishedBuildScan> action) {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public void executeOnce(String identifier, Consumer<? super BuildScanApi> action) {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public boolean isCaptureGoalInputFiles() {
-			return this.captureGoalInputFiles;
-		}
-
-		@Override
-		public void obfuscation(Consumer<? super BuildScanDataObfuscation> action) {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public void publishOnDemand() {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public void setCaptureGoalInputFiles(boolean capture) {
-			this.captureGoalInputFiles = capture;
 		}
 
 	}

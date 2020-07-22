@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.spring.ge.gradle;
+package io.spring.ge.conventions.gradle;
 
 import java.io.File;
 import java.io.FileReader;
@@ -28,7 +28,7 @@ import java.util.Properties;
 import java.util.function.Consumer;
 
 import com.gradle.enterprise.gradleplugin.GradleEnterprisePlugin;
-import io.spring.ge.core.ConfigurableBuildScan;
+import io.spring.ge.conventions.core.ConfigurableBuildScan;
 import org.gradle.testkit.runner.BuildResult;
 import org.gradle.testkit.runner.GradleRunner;
 import org.junit.jupiter.api.Test;
@@ -92,7 +92,7 @@ class GradleEnterpriseConventionsPluginIntegrationTests {
 		write(new File(projectDir, "build.gradle"), (writer) -> {
 			writer.println("plugins {");
 			writer.println("    id 'com.gradle.build-scan'");
-			writer.println("    id 'io.spring.ge' version '" + version() + "'");
+			writer.println("    id 'io.spring.ge.conventions' version '" + version() + "'");
 			writer.println("}");
 			writer.println("task verifyBuildScanConfig {");
 			writer.println("    doFirst {");
@@ -107,7 +107,7 @@ class GradleEnterpriseConventionsPluginIntegrationTests {
 		write(new File(projectDir, "settings.gradle"), (writer) -> {
 			writer.println("plugins {");
 			writer.println("    id 'com.gradle.enterprise'");
-			writer.println("    id 'io.spring.ge' version '" + version() + "'");
+			writer.println("    id 'io.spring.ge.conventions' version '" + version() + "'");
 			writer.println("}");
 			writer.println("gradle.afterProject { project -> project.ext['settings'] = settings }");
 		});

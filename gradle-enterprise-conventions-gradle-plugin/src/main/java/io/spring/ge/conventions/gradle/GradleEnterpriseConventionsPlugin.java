@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.spring.ge.gradle;
+package io.spring.ge.conventions.gradle;
 
 import java.io.File;
 
@@ -23,7 +23,7 @@ import javax.inject.Inject;
 import com.gradle.enterprise.gradleplugin.GradleEnterpriseExtension;
 import com.gradle.enterprise.gradleplugin.GradleEnterprisePlugin;
 import com.gradle.scan.plugin.BuildScanExtension;
-import io.spring.ge.core.BuildScanConventions;
+import io.spring.ge.conventions.core.BuildScanConventions;
 import org.gradle.StartParameter;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;

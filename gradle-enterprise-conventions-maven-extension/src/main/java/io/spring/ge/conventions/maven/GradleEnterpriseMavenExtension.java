@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.spring.ge.maven;
+package io.spring.ge.conventions.maven;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -27,8 +27,8 @@ import java.util.stream.Stream;
 import javax.inject.Inject;
 
 import com.gradle.maven.extension.api.scan.BuildScanApi;
-import io.spring.ge.core.BuildScanConventions;
-import io.spring.ge.core.ProcessRunner;
+import io.spring.ge.conventions.core.BuildScanConventions;
+import io.spring.ge.conventions.core.ProcessRunner;
 import org.apache.maven.AbstractMavenLifecycleParticipant;
 import org.apache.maven.MavenExecutionException;
 import org.apache.maven.execution.MavenSession;

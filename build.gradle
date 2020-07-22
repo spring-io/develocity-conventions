@@ -1,5 +1,5 @@
 allprojects {
-	group = 'io.spring.ge'	
+	group = 'io.spring.ge.conventions'	
 }
 
 subprojects {

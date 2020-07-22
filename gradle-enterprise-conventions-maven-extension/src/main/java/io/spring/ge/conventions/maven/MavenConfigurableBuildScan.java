@@ -14,35 +14,34 @@
  * limitations under the License.
  */
 
-package io.spring.ge.gradle;
+package io.spring.ge.conventions.maven;
 
 import java.net.InetAddress;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import com.gradle.scan.plugin.BuildScanDataObfuscation;
-import com.gradle.scan.plugin.BuildScanExtension;
-import com.gradle.scan.plugin.internal.api.BuildScanExtensionWithHiddenFeatures;
-import io.spring.ge.core.ConfigurableBuildScan;
+import com.gradle.maven.extension.api.scan.BuildScanApi;
+import com.gradle.maven.extension.api.scan.BuildScanDataObfuscation;
+import io.spring.ge.conventions.core.ConfigurableBuildScan;
 
 /**
- * A {@link ConfigurableBuildScan} that configures a {@link BuildScanExtension} for a
- * Gradle build.
+ * A {@link ConfigurableBuildScan} that configures a {@link BuildScanApi build scan} for a
+ * Maven build.
  *
  * @author Andy Wilkinson
  */
-class GradleConfigurableBuildScan implements ConfigurableBuildScan {
+class MavenConfigurableBuildScan implements ConfigurableBuildScan {
 
-	private final BuildScanExtension buildScan;
+	private final BuildScanApi buildScan;
 
-	GradleConfigurableBuildScan(BuildScanExtension buildScan) {
+	MavenConfigurableBuildScan(BuildScanApi buildScan) {
 		this.buildScan = buildScan;
 	}
 
 	@Override
 	public void captureInputFiles(boolean capture) {
-		this.buildScan.setCaptureTaskInputFiles(capture);
+		this.buildScan.setCaptureGoalInputFiles(capture);
 	}
 
 	@Override
@@ -57,17 +56,12 @@ class GradleConfigurableBuildScan implements ConfigurableBuildScan {
 
 	@Override
 	public void uploadInBackground(boolean enabled) {
-		try {
-			this.buildScan.setUploadInBackground(enabled);
-		}
-		catch (NoSuchMethodError ex) {
-			// GE Plugin version < 3.3. Continue
-		}
+		this.buildScan.setUploadInBackground(enabled);
 	}
 
 	@Override
 	public void obfuscation(Consumer<ObfuscationConfigurer> configurer) {
-		configurer.accept(new GradleObfusactionConfigurer(this.buildScan.getObfuscation()));
+		configurer.accept(new MavenObfusactionConfigurer(this.buildScan.getObfuscation()));
 	}
 
 	@Override
@@ -77,7 +71,7 @@ class GradleConfigurableBuildScan implements ConfigurableBuildScan {
 
 	@Override
 	public void publishIfAuthenticated() {
-		((BuildScanExtensionWithHiddenFeatures) this.buildScan).publishIfAuthenticated();
+		// Enabled via gradle-enterprise.xml
 	}
 
 	@Override
@@ -97,14 +91,14 @@ class GradleConfigurableBuildScan implements ConfigurableBuildScan {
 
 	@Override
 	public void background(Consumer<ConfigurableBuildScan> buildScan) {
-		this.buildScan.background((extension) -> buildScan.accept(new GradleConfigurableBuildScan(extension)));
+		this.buildScan.background((api) -> buildScan.accept(new MavenConfigurableBuildScan(api)));
 	}
 
-	private static final class GradleObfusactionConfigurer implements ObfuscationConfigurer {
+	private static final class MavenObfusactionConfigurer implements ObfuscationConfigurer {
 
 		private final BuildScanDataObfuscation obfuscation;
 
-		private GradleObfusactionConfigurer(BuildScanDataObfuscation obfuscation) {
+		private MavenObfusactionConfigurer(BuildScanDataObfuscation obfuscation) {
 			this.obfuscation = obfuscation;
 		}
 

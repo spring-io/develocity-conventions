@@ -4,7 +4,7 @@
     <component>
       <role>org.apache.maven.AbstractMavenLifecycleParticipant</role>
       <role-hint>default</role-hint>
-      <implementation>io.spring.ge.maven.GradleEnterpriseMavenExtension</implementation>
+      <implementation>io.spring.ge.conventions.maven.GradleEnterpriseMavenExtension</implementation>
       <description />
       <isolated-realm>false</isolated-realm>
     </component>

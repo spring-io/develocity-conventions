@@ -119,7 +119,7 @@ The plugin should be applied in `build.gradle` of the root project, alongside th
 plugins {
 	// …
 	id "com.gradle.build-scan" version "<<version>>"
-	id "io.spring.ge" version "<<version>>"
+	id "io.spring.ge.conventions" version "<<version>>"
 	// …
 }
 ```
@@ -132,7 +132,7 @@ The plugin should be applied in `settings.gradle`, alongside the `com.gradle.ent
 plugins {
 	// …
 	id "com.gradle.enterprise" version "<<version>>"
-	id "io.spring.ge" version "<<version>>"
+	id "io.spring.ge.conventions" version "<<version>>"
 	// …
 }
 ```
@@ -149,7 +149,7 @@ To use the conventions, configure both the Gradle Enterprise and the Conventions
         <version><<version>></version>
     </extension>
     <extension>
-        <groupId>io.spring.ge</groupId>
+        <groupId>io.spring.ge.conventions</groupId>
         <artifactId>gradle-enterprise-conventions-maven-extension</artifactId>
         <version><<version>></version>
     </extension>

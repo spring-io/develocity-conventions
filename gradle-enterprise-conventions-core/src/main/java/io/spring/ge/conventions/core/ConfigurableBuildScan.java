@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.spring.ge.core;
+package io.spring.ge.conventions.core;
 
 import java.net.InetAddress;
 import java.util.List;

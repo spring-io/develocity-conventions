@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package io.spring.ge.gradle;
+package io.spring.ge.conventions.gradle;
 
 import java.io.OutputStream;
 import java.util.function.Consumer;
 
-import io.spring.ge.core.ProcessRunner;
+import io.spring.ge.conventions.core.ProcessRunner;
 import org.gradle.api.internal.ProcessOperations;
 import org.gradle.process.ExecSpec;
 

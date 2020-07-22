@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.spring.ge.gradle;
+package io.spring.ge.conventions.gradle;
 
 import java.util.Map;
 

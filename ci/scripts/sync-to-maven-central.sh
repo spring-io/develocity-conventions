@@ -12,7 +12,7 @@ echo "Syncing ${buildName}/${buildNumber} to Maven Central"
 			-o /dev/null \
 			-I \
 			-w "%{http_code}" \
-			"https://oss.sonatype.org/service/local/repositories/releases/content/io/spring/ge/gradle-enterprise-conventions-core/${version}/gradle-enterprise-conventions-core-${version}.jar.sha1")
+			"https://oss.sonatype.org/service/local/repositories/releases/content/io/spring/ge/conventions/gradle-enterprise-conventions-core/${version}/gradle-enterprise-conventions-core-${version}.jar.sha1")
 
 	if [ ${publishStatus} == "200" ]; then
 		echo "Already published to Sonatype"

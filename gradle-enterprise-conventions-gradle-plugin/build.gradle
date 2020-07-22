@@ -28,8 +28,8 @@ gradlePlugin {
 		gradleEnterprisePlugin {
 			displayName = project.description
 			description = project.description
-			id = 'io.spring.ge'
-			implementationClass = 'io.spring.ge.gradle.GradleEnterpriseConventionsPlugin'
+			id = 'io.spring.ge.conventions'
+			implementationClass = 'io.spring.ge.conventions.gradle.GradleEnterpriseConventionsPlugin'
 		}
 	}
 }

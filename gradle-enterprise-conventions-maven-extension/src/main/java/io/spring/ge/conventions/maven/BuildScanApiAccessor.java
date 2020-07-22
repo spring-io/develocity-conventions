@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.spring.ge.maven;
+package io.spring.ge.conventions.maven;
 
 import java.util.Comparator;
 import java.util.Optional;

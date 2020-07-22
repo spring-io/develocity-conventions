@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.spring.ge.core;
+package io.spring.ge.conventions.core;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -29,7 +29,7 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import io.spring.ge.core.ConfigurableBuildScan.ObfuscationConfigurer;
+import io.spring.ge.conventions.core.ConfigurableBuildScan.ObfuscationConfigurer;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
