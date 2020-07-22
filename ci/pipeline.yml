@@ -18,7 +18,7 @@ resources:
   source:
     owner: spring-io
     repository: gradle-enterprise-conventions
-    access_token: ((github-release-notes-access-token))
+    access_token: ((github-ci-release-token))
     pre_release: false
 - name: ci-image-git-repo
   type: git
@@ -136,7 +136,7 @@ jobs:
     params:
       RELEASE_TYPE: RELEASE
       GITHUB_USERNAME: ((github-username))
-      GITHUB_TOKEN: ((github-release-notes-access-token))
+      GITHUB_TOKEN: ((github-ci-release-token))
   - put: github-release
     params:
       name: generated-release-notes/tag
