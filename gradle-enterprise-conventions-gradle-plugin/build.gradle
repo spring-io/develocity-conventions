@@ -28,7 +28,7 @@ gradlePlugin {
 		gradleEnterprisePlugin {
 			displayName = project.description
 			description = project.description
-			id = 'io.spring.ge.conventions'
+			id = 'io.spring.ge'
 			implementationClass = 'io.spring.ge.gradle.GradleEnterpriseConventionsPlugin'
 		}
 	}
