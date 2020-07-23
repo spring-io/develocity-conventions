@@ -3,7 +3,7 @@
 	<components>
 		<component>
 			<role>org.apache.maven.AbstractMavenLifecycleParticipant</role>
-			<role-hint>default</role-hint>
+			<role-hint>spring-gradle-enterprise-conventions</role-hint>
 			<implementation>io.spring.ge.conventions.maven.GradleEnterpriseMavenExtension</implementation>
 		</component>
 	</components>
