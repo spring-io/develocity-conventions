@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component-set>
-  <components>
-    <component>
-      <role>org.apache.maven.AbstractMavenLifecycleParticipant</role>
-      <role-hint>default</role-hint>
-      <implementation>io.spring.ge.conventions.maven.GradleEnterpriseMavenExtension</implementation>
-      <description />
-      <isolated-realm>false</isolated-realm>
-    </component>
-  </components>
+	<components>
+		<component>
+			<role>org.apache.maven.AbstractMavenLifecycleParticipant</role>
+			<role-hint>default</role-hint>
+			<implementation>io.spring.ge.conventions.maven.GradleEnterpriseMavenExtension</implementation>
+		</component>
+	</components>
 </component-set>
