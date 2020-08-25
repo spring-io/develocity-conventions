@@ -75,9 +75,15 @@ public class GradleEnterpriseConventionsPlugin implements Plugin<Object> {
 	private void configureBuildScanConventions(BuildScanExtension buildScan, StartParameter startParameter,
 			File rootDir) {
 		if (!startParameter.isNoBuildScan()) {
-			new BuildScanConventions(new ProcessOperationsProcessRunner(
-					new WorkingDirectoryProcessOperations(this.processOperations, rootDir)))
-							.execute(new GradleConfigurableBuildScan(buildScan));
+			ProcessOperationsProcessRunner processRunner = new ProcessOperationsProcessRunner(
+					new WorkingDirectoryProcessOperations(this.processOperations, rootDir));
+			GradleConfigurableBuildScan configurableBuildScan = new GradleConfigurableBuildScan(buildScan);
+			if (startParameter.isBuildScan()) {
+				new AnonymousPublicationBuildScanConventions(processRunner).execute(configurableBuildScan);
+			}
+			else {
+				new BuildScanConventions(processRunner).execute(configurableBuildScan);
+			}
 		}
 	}
 

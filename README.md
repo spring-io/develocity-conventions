@@ -58,6 +58,8 @@ The build scans will be customized to:
 Publishing to [ge.spring.io](https://ge.spring.io) requires authentication via an access key.
 When running on CI, the access key should be made available via the `GRADLE_ENTERPRISE_ACCESS_KEY` environment variable.
 
+When using Gradle, build scans can be published anonymously to scans.gradle.com by running the build with `--scan`.
+
 #### Bamboo
 
 The environment variable should be set to `${bamboo.gradle_enterprise_secret_access_key}`.

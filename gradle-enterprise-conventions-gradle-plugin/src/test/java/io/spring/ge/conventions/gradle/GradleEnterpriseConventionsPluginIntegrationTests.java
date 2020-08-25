@@ -48,6 +48,7 @@ class GradleEnterpriseConventionsPluginIntegrationTests {
 		prepareGradle6Project(projectDir);
 		BuildResult result = build(projectDir, "6.0.1", "verifyBuildScanConfig");
 		assertThat(result.getOutput()).contains("Build scan server: https://ge.spring.io");
+		assertThat(result.getOutput()).contains("Capture task input files: true");
 	}
 
 	@Test
@@ -63,6 +64,15 @@ class GradleEnterpriseConventionsPluginIntegrationTests {
 		prepareGradle6Project(projectDir);
 		BuildResult result = build(projectDir, "6.0.1", "verifyBuildScanConfig", "--no-scan");
 		assertThat(result.getOutput()).contains("Build scan server: null");
+		assertThat(result.getOutput()).contains("Capture task input files: false");
+	}
+
+	@Test
+	void givenGradle6WhenThePluginIsAppliedAndScanIsSpecifiedThenServerIsNotCustomized(@TempDir File projectDir) {
+		prepareGradle6Project(projectDir);
+		BuildResult result = build(projectDir, "6.0.1", "verifyBuildScanConfig", "--scan");
+		assertThat(result.getOutput()).contains("Build scan server: null");
+		assertThat(result.getOutput()).contains("Capture task input files: true");
 	}
 
 	@Test
@@ -78,6 +88,7 @@ class GradleEnterpriseConventionsPluginIntegrationTests {
 		prepareGradle5Project(projectDir);
 		BuildResult result = build(projectDir, "5.6.4", "verifyBuildScanConfig");
 		assertThat(result.getOutput()).contains("Build scan server: https://ge.spring.io");
+		assertThat(result.getOutput()).contains("Capture task input files: true");
 	}
 
 	@Test
@@ -86,6 +97,15 @@ class GradleEnterpriseConventionsPluginIntegrationTests {
 		prepareGradle5Project(projectDir);
 		BuildResult result = build(projectDir, "5.6.4", "verifyBuildScanConfig", "--no-scan");
 		assertThat(result.getOutput()).contains("Build scan server: null");
+		assertThat(result.getOutput()).contains("Capture task input files: false");
+	}
+
+	@Test
+	void givenGradle5WhenThePluginIsAppliedAndScanIsSpecifiedThenServerIsNotCustomized(@TempDir File projectDir) {
+		prepareGradle5Project(projectDir);
+		BuildResult result = build(projectDir, "5.6.4", "verifyBuildScanConfig", "--scan");
+		assertThat(result.getOutput()).contains("Build scan server: null");
+		assertThat(result.getOutput()).contains("Capture task input files: true");
 	}
 
 	private void prepareGradle5Project(File projectDir) {
@@ -97,6 +117,7 @@ class GradleEnterpriseConventionsPluginIntegrationTests {
 			writer.println("task verifyBuildScanConfig {");
 			writer.println("    doFirst {");
 			writer.println("        println \"Build scan server: ${buildScan.server}\"");
+			writer.println("        println \"Capture task input files: ${buildScan.captureTaskInputFiles}\"");
 			writer.println("    }");
 			writer.println("}");
 		});
@@ -115,6 +136,7 @@ class GradleEnterpriseConventionsPluginIntegrationTests {
 			writer.println("task verifyBuildScanConfig {");
 			writer.println("    doFirst {");
 			writer.println("        println \"Build scan server: ${buildScan.server}\"");
+			writer.println("        println \"Capture task input files: ${buildScan.captureTaskInputFiles}\"");
 			writer.println("    }");
 			writer.println("}");
 			writer.println("task verifyBuildCacheConfig {");

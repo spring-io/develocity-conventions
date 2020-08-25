@@ -53,13 +53,23 @@ public class BuildScanConventions {
 		buildScan.captureInputFiles(true);
 		buildScan.obfuscation((obfuscation) -> obfuscation.ipAddresses(
 				(addresses) -> addresses.stream().map((address) -> "0.0.0.0").collect(Collectors.toList())));
-		buildScan.publishAlways();
-		buildScan.publishIfAuthenticated();
-		buildScan.server("https://ge.spring.io");
+		configurePublishing(buildScan);
 		tagBuildScan(buildScan);
 		buildScan.background(this::addGitMetadata);
 		addCiMetadata(buildScan);
 		buildScan.uploadInBackground(!isCi());
+	}
+
+	/**
+	 * Configures publishing of the build scan. The default implementation always
+	 * publishes scans when authenticated and publishes them to
+	 * {@code https://ge.spring.io}.
+	 * @param buildScan build scan to configure
+	 */
+	protected void configurePublishing(ConfigurableBuildScan buildScan) {
+		buildScan.publishAlways();
+		buildScan.publishIfAuthenticated();
+		buildScan.server("https://ge.spring.io");
 	}
 
 	private void tagBuildScan(ConfigurableBuildScan buildScan) {
@@ -103,7 +113,10 @@ public class BuildScanConventions {
 		run("git", "rev-parse", "--short=8", "--verify", "HEAD").standardOut((gitCommitId) -> {
 			String commitIdLabel = "Git commit";
 			buildScan.value(commitIdLabel, gitCommitId);
-			buildScan.link("Git commit build scans", buildScan.server() + createSearchUrl(commitIdLabel, gitCommitId));
+			String server = buildScan.server();
+			if (server != null) {
+				buildScan.link("Git commit build scans", server + createSearchUrl(commitIdLabel, gitCommitId));
+			}
 		});
 		getBranch().standardOut((gitBranchName) -> {
 			buildScan.tag(gitBranchName);
