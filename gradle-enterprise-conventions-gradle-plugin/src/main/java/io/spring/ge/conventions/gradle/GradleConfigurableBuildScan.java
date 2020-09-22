@@ -21,9 +21,9 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import com.gradle.enterprise.gradleplugin.internal.extension.BuildScanExtensionWithHiddenFeatures;
 import com.gradle.scan.plugin.BuildScanDataObfuscation;
 import com.gradle.scan.plugin.BuildScanExtension;
-import com.gradle.scan.plugin.internal.api.BuildScanExtensionWithHiddenFeatures;
 import io.spring.ge.conventions.core.ConfigurableBuildScan;
 
 /**

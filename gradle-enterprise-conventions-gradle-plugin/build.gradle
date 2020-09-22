@@ -18,7 +18,7 @@ configurations {
 
 dependencies {
 	implementation(project(":gradle-enterprise-conventions-core"))
-	compatibilityTestImplementation("com.gradle:gradle-enterprise-gradle-plugin:3.1.1")
+	compatibilityTestImplementation("com.gradle:gradle-enterprise-gradle-plugin:3.4")
 	compileOnly("com.gradle:gradle-enterprise-gradle-plugin:${gradleEnterprisePluginVersion}")
 	testImplementation("com.gradle:gradle-enterprise-gradle-plugin:${gradleEnterprisePluginVersion}")
 }
