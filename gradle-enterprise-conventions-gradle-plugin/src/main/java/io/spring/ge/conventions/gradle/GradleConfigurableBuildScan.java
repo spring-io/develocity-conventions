@@ -23,7 +23,6 @@ import java.util.function.Function;
 
 import com.gradle.scan.plugin.BuildScanDataObfuscation;
 import com.gradle.scan.plugin.BuildScanExtension;
-import com.gradle.scan.plugin.internal.api.BuildScanExtensionWithHiddenFeatures;
 import io.spring.ge.conventions.core.ConfigurableBuildScan;
 
 /**
@@ -77,7 +76,12 @@ class GradleConfigurableBuildScan implements ConfigurableBuildScan {
 
 	@Override
 	public void publishIfAuthenticated() {
-		((BuildScanExtensionWithHiddenFeatures) this.buildScan).publishIfAuthenticated();
+		try {
+			this.buildScan.getClass().getMethod("publishIfAuthenticated").invoke(this.buildScan);
+		}
+		catch (Exception ex) {
+			throw new RuntimeException("Failed to invoke publishIfAuthenticated()", ex);
+		}
 	}
 
 	@Override

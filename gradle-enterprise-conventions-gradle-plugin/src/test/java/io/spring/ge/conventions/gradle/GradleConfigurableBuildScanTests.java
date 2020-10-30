@@ -30,7 +30,6 @@ import com.gradle.scan.plugin.BuildResult;
 import com.gradle.scan.plugin.BuildScanDataObfuscation;
 import com.gradle.scan.plugin.BuildScanExtension;
 import com.gradle.scan.plugin.PublishedBuildScan;
-import com.gradle.scan.plugin.internal.api.BuildScanExtensionWithHiddenFeatures;
 import org.gradle.api.Action;
 import org.junit.jupiter.api.Test;
 
@@ -115,7 +114,7 @@ class GradleConfigurableBuildScanTests {
 		assertThat(this.extension.server).isEqualTo("https://background.example.com");
 	}
 
-	public static final class TestBuildScanExtension implements BuildScanExtensionWithHiddenFeatures {
+	public static final class TestBuildScanExtension implements BuildScanExtension {
 
 		private final TestBuildScanDataObfuscation obfuscation = new TestBuildScanDataObfuscation();
 
@@ -191,16 +190,10 @@ class GradleConfigurableBuildScanTests {
 		}
 
 		@Override
-		public void onError(Action<String> action) {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
 		public void publishAlways() {
 			this.publishAlways = true;
 		}
 
-		@Override
 		public void publishIfAuthenticated() {
 			this.publishIfAuthenticated = true;
 		}

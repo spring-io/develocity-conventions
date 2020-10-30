@@ -3,6 +3,7 @@ plugins {
 	id "io.spring.javaformat" version "$javaFormatVersion"
 	id "java-gradle-plugin"
 	id "maven-publish"
+	id "io.spring.compatibility-test"
 }
 
 description = "Gradle Enterprise Conventions Gradle plugin"
@@ -18,7 +19,6 @@ configurations {
 
 dependencies {
 	implementation(project(":gradle-enterprise-conventions-core"))
-	compatibilityTestImplementation("com.gradle:gradle-enterprise-gradle-plugin:3.1.1")
 	compileOnly("com.gradle:gradle-enterprise-gradle-plugin:${gradleEnterprisePluginVersion}")
 	testImplementation("com.gradle:gradle-enterprise-gradle-plugin:${gradleEnterprisePluginVersion}")
 }
@@ -34,13 +34,22 @@ gradlePlugin {
 	}
 }
 
-task compatibilityTest(type: Test) {
-	classpath = configurations.compatibilityTestImplementation + test.classpath
-	filter {
-		includeTestsMatching "*IntegrationTests"
+compatibilityTest {
+	useJUnitPlatform()
+	dependency('Gradle Enterprise Plugin') { gePlugin ->
+		gePlugin.groupId = 'com.gradle'
+		gePlugin.artifactId = 'gradle-enterprise-gradle-plugin'
+		gePlugin.versions = [
+			'3.1.1', '3.2.1', '3.3.4', '3.4.1', '3.5'
+		]
 	}
 }
 
-check {
-	dependsOn compatibilityTest
+tasks.withType(Test) { testTask ->
+	if (testTask.name.startsWith("compatibilityTest_")) {
+		testTask.filter {
+			includeTestsMatching "*IntegrationTests"
+		}
+	}
 }
+
