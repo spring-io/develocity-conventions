@@ -17,8 +17,6 @@
 package io.spring.ge.conventions.gradle;
 
 import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.gradle.api.Action;
 import org.gradle.caching.BuildCacheServiceFactory;
@@ -31,37 +29,45 @@ import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Tests for {@link BuildCacheConventions}.
+ * Tests for {@link GradleConfigurableBuildCache}.
  *
  * @author Andy Wilkinson
  */
-class BuildCacheConventionsTests {
+class GradleConfigurableBuildCacheTests {
 
-	private final TestBuildCacheConfiguration buildCache = new TestBuildCacheConfiguration();
+	private final TestBuildCacheConfiguration configuration = new TestBuildCacheConfiguration();
+
+	private final GradleConfigurableBuildCache buildCache = new GradleConfigurableBuildCache(this.configuration);
 
 	@Test
-	void localCacheIsEnabled() {
-		new BuildCacheConventions().execute(this.buildCache);
-		assertThat(this.buildCache.local.isEnabled()).isTrue();
+	void localCacheCanBeEnabled() {
+		this.buildCache.local((local) -> local.enable());
+		assertThat(this.configuration.local.isEnabled()).isTrue();
 	}
 
 	@Test
-	void remoteCacheIsEnabled() {
-		new BuildCacheConventions().execute(this.buildCache);
-		assertThat(this.buildCache.remote.isEnabled()).isTrue();
-		assertThat(this.buildCache.remote.getUrl()).isEqualTo(URI.create("https://ge.spring.io/cache/"));
-		assertThat(this.buildCache.remote.isPush()).isFalse();
+	void remoteCacheCanBeEnabled() {
+		this.buildCache.remote((remote) -> remote.enable());
+		assertThat(this.configuration.remote.isEnabled()).isTrue();
 	}
 
 	@Test
-	void whenCredentialsAreProvidedThenPushingToTheRemoteCacheIsEnabled() {
-		Map<String, String> env = new HashMap<String, String>();
-		env.put("GRADLE_ENTERPRISE_CACHE_USERNAME", "user");
-		env.put("GRADLE_ENTERPRISE_CACHE_PASSWORD", "secret");
-		new BuildCacheConventions(env).execute(this.buildCache);
-		assertThat(this.buildCache.remote.isPush()).isTrue();
-		assertThat(this.buildCache.remote.getCredentials().getUsername()).isEqualTo("user");
-		assertThat(this.buildCache.remote.getCredentials().getPassword()).isEqualTo("secret");
+	void pushingToRemoteCacheCanBeEnabled() {
+		this.buildCache.remote((remote) -> remote.enablePush());
+		assertThat(this.configuration.remote.isPush()).isTrue();
+	}
+
+	@Test
+	void remoteCacheUriCanBeConfigured() {
+		this.buildCache.remote((remote) -> remote.setUri(URI.create("https://cache.example.com/")));
+		assertThat(this.configuration.remote.getUrl()).isEqualTo(URI.create("https://cache.example.com/"));
+	}
+
+	@Test
+	void remoteCacheCredentialsCanBeConfigured() {
+		this.buildCache.remote((remote) -> remote.setCredentials("alice", "secret"));
+		assertThat(this.configuration.remote.getCredentials().getUsername()).isEqualTo("alice");
+		assertThat(this.configuration.remote.getCredentials().getPassword()).isEqualTo("secret");
 	}
 
 	private static final class TestBuildCacheConfiguration implements BuildCacheConfiguration {
@@ -81,23 +87,25 @@ class BuildCacheConventionsTests {
 		}
 
 		@Override
-		public <T extends DirectoryBuildCache> T local(Class<T> arg0) {
+		@Deprecated
+		public <T extends DirectoryBuildCache> T local(Class<T> cacheType) {
 			throw new UnsupportedOperationException();
 		}
 
 		@Override
-		public void local(Action<? super DirectoryBuildCache> arg0) {
+		public void local(Action<? super DirectoryBuildCache> cacheType) {
 			throw new UnsupportedOperationException();
 		}
 
 		@Override
-		public <T extends DirectoryBuildCache> T local(Class<T> arg0, Action<? super T> arg1) {
+		@Deprecated
+		public <T extends DirectoryBuildCache> T local(Class<T> cacheType, Action<? super T> action) {
 			throw new UnsupportedOperationException();
 		}
 
 		@Override
-		public <T extends BuildCache> void registerBuildCacheService(Class<T> arg0,
-				Class<? extends BuildCacheServiceFactory<? super T>> arg1) {
+		public <T extends BuildCache> void registerBuildCacheService(Class<T> cacheType,
+				Class<? extends BuildCacheServiceFactory<? super T>> factory) {
 			throw new UnsupportedOperationException();
 		}
 

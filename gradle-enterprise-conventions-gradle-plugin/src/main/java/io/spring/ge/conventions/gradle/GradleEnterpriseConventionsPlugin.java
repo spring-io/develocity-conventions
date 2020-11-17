@@ -23,6 +23,7 @@ import javax.inject.Inject;
 import com.gradle.enterprise.gradleplugin.GradleEnterpriseExtension;
 import com.gradle.enterprise.gradleplugin.GradleEnterprisePlugin;
 import com.gradle.scan.plugin.BuildScanExtension;
+import io.spring.ge.conventions.core.BuildCacheConventions;
 import io.spring.ge.conventions.core.BuildScanConventions;
 import org.gradle.StartParameter;
 import org.gradle.api.Plugin;
@@ -62,7 +63,8 @@ public class GradleEnterpriseConventionsPlugin implements Plugin<Object> {
 					settings.getRootDir());
 		});
 		if (settings.getStartParameter().isBuildCacheEnabled()) {
-			settings.buildCache(new BuildCacheConventions());
+			settings.buildCache((buildCacheConfiguration) -> new BuildCacheConventions()
+					.execute(new GradleConfigurableBuildCache(buildCacheConfiguration)));
 		}
 	}
 

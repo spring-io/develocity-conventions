@@ -26,7 +26,9 @@ import java.util.stream.Stream;
 
 import javax.inject.Inject;
 
+import com.gradle.maven.extension.api.cache.BuildCacheApi;
 import com.gradle.maven.extension.api.scan.BuildScanApi;
+import io.spring.ge.conventions.core.BuildCacheConventions;
 import io.spring.ge.conventions.core.BuildScanConventions;
 import io.spring.ge.conventions.core.ProcessRunner;
 import org.apache.maven.AbstractMavenLifecycleParticipant;
@@ -58,12 +60,19 @@ public final class GradleEnterpriseMavenExtension extends AbstractMavenLifecycle
 	@Override
 	public void afterSessionStart(MavenSession session) throws MavenExecutionException {
 		log.debug("Executing extension: {}", getClass().getSimpleName());
-		BuildScanApi buildScan = BuildScanApiAccessor.lookup(this.container, getClass());
+		ApiAccessor apiAccessor = new ApiAccessor(getClass().getClassLoader(), this.container);
+		BuildScanApi buildScan = apiAccessor.lookUpBuildScanApi();
 		if (buildScan != null) {
 			log.debug("Applying build scan conventions");
 			new BuildScanConventions(new ProcessBuilderProcessRunner())
 					.execute(new MavenConfigurableBuildScan(buildScan));
 			log.debug("Build scan conventions applied");
+		}
+		BuildCacheApi buildCache = apiAccessor.lookUpBuildCacheApi();
+		if (buildCache != null) {
+			log.debug("Applying build cache conventions");
+			new BuildCacheConventions().execute(new MavenConfigurableBuildCache(buildCache));
+			log.debug("Build cache conventions applied");
 		}
 	}
 
