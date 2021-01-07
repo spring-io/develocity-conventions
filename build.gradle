@@ -49,30 +49,30 @@ subprojects {
 					pom {
 						name = project.description
 						description = project.description
-                		url = 'https://github.com/spring-io/gradle-enterprise-conventions'
-                		organization {
-                    		name = 'Pivotal Software, Inc.'
-                    		url = 'https://spring.io'
-                		}
-                		licenses {
-                    		license {
-                        		name = 'The Apache Software License, Version 2.0'
-                        		url = 'https://www.apache.org/licenses/LICENSE-2.0.txt'
-                    		}
-                		}
-                		scm {
-                    		url = 'https://github.com/spring-io/gradle-enterprise-conventions'
-                    		connection = 'scm:git:https://github.com/spring-io/gradle-enterprise-conventions'
-                		}
-                		developers {
-                    		developer {
-                        		id = 'wilkinsona'
-                        		name = 'Andy Wilkinson'
-                        		email = 'awilkinson@pivotal.io'
-                        		roles = ["Project lead"]
-                        	}
-                    	}
-                	}
+						url = 'https://github.com/spring-io/gradle-enterprise-conventions'
+						organization {
+							name = 'Pivotal Software, Inc.'
+							url = 'https://spring.io'
+						}
+						licenses {
+							license {
+								name = 'The Apache Software License, Version 2.0'
+								url = 'https://www.apache.org/licenses/LICENSE-2.0.txt'
+							}
+						}
+						scm {
+							url = 'https://github.com/spring-io/gradle-enterprise-conventions'
+							connection = 'scm:git:https://github.com/spring-io/gradle-enterprise-conventions'
+						}
+						developers {
+							developer {
+								id = 'wilkinsona'
+								name = 'Andy Wilkinson'
+								email = 'awilkinson@pivotal.io'
+								roles = ["Project lead"]
+							}
+						}
+					}
 				}
 			}
 		}
