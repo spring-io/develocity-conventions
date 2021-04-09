@@ -143,9 +143,9 @@ jobs:
       tag: generated-release-notes/tag
       body: generated-release-notes/release-notes.md
 groups:
-- name: "Build"
+- name: "build"
   jobs: ["build"]
-- name: "Release"
+- name: "release"
   jobs: ["stage-release", "promote-release", "sync-to-maven-central"]
-- name: "CI Image"
+- name: "ci-image"
   jobs: ["build-ci-image"]
