@@ -1,11 +1,11 @@
 allprojects {
-	group = 'io.spring.ge.conventions'	
+	group = 'io.spring.ge.conventions'
 }
 
 subprojects {
 	plugins.withType(JavaPlugin) {
 		sourceCompatibility = 1.8
-		targetCompatibility = 1.8	
+		targetCompatibility = 1.8
 		dependencies {
 			testImplementation("org.assertj:assertj-core:3.11.1")
 			testImplementation("org.junit.jupiter:junit-jupiter:5.6.0")
