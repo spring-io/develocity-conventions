@@ -81,10 +81,26 @@ public class GradleEnterpriseConventionsPlugin implements Plugin<Object> {
 					new WorkingDirectoryProcessOperations(this.processOperations, rootDir));
 			GradleConfigurableBuildScan configurableBuildScan = new GradleConfigurableBuildScan(buildScan);
 			if (startParameter.isBuildScan()) {
-				new AnonymousPublicationBuildScanConventions(processRunner).execute(configurableBuildScan);
+				new AnonymousPublicationBuildScanConventions(processRunner) {
+
+					@Override
+					protected String getJdkVersion() {
+						String toolchainVersion = startParameter.getProjectProperties().get("toolchainVersion");
+						return (toolchainVersion != null) ? toolchainVersion : super.getJdkVersion();
+					}
+
+				}.execute(configurableBuildScan);
 			}
 			else {
-				new BuildScanConventions(processRunner).execute(configurableBuildScan);
+				new BuildScanConventions(processRunner) {
+
+					@Override
+					protected String getJdkVersion() {
+						String toolchainVersion = startParameter.getProjectProperties().get("toolchainVersion");
+						return (toolchainVersion != null) ? toolchainVersion : super.getJdkVersion();
+					}
+
+				}.execute(configurableBuildScan);
 			}
 		}
 	}

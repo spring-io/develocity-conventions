@@ -102,7 +102,11 @@ public class BuildScanConventions {
 	}
 
 	private void tagJdk(ConfigurableBuildScan buildScan) {
-		buildScan.tag("JDK-" + System.getProperty("java.specification.version"));
+		buildScan.tag("JDK-" + getJdkVersion());
+	}
+
+	protected String getJdkVersion() {
+		return System.getProperty("java.specification.version");
 	}
 
 	private void tagOperatingSystem(ConfigurableBuildScan buildScan) {
