@@ -36,7 +36,7 @@ When applied as a settings plugin (Gradle 6) or a project plugin (Gradle 5) alon
 The build scans will be customized to:
 
 - Add tags:
-    - `JDK-<version>`, where `<version>` is the specification version of the JDK running the build.
+    - `JDK-<version>`, where `<version>` is the value of the `toolchainVersion` project property or, when not set, the specification version of the JDK running the build.
     - `CI` or `Local` depending on where the build is executing.
     - `dirty` if the git working copy is dirty.
     - Name of the git branch being built.
