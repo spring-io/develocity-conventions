@@ -1,6 +1,6 @@
 # Gradle Enterprise Conventions
 
-Conventions for Maven and Gradle projects that use the Gradle Enterprise instance hosted at [ge.spring.io](https://ge.spring.io).
+Conventions for Gradle projects that use the Gradle Enterprise instance hosted at [ge.spring.io](https://ge.spring.io).
 
 ## Build cache conventions
 
@@ -96,8 +96,6 @@ Jenkins is detected by looking for an environment variable named `JENKINS_URL`.
 The conventions are published to https://repo.spring.io.
 Depending on the version you wish to use, they will be availble from the `snapshot` or `release` repository.
 
-### Gradle
-
 The first step in using the conventions is to make the necessary repository available for plugin resolution.
 This is done by configuring a plugin management repository in `settings.gradle`, as shown in the following example:
 
@@ -137,23 +135,4 @@ plugins {
 	id "io.spring.ge.conventions" version "<<version>>"
 	// …
 }
-```
-
-### Maven
-
-To use the conventions, configure both the Gradle Enterprise and the Conventions Maven extensions in `.mvn/extensions.xml`, as showing in the following example:
-
-```xml
-<extensions>
-    <extension>
-        <groupId>com.gradle</groupId>
-        <artifactId>gradle-enterprise-maven-extension</artifactId>
-        <version><<version>></version>
-    </extension>
-    <extension>
-        <groupId>io.spring.ge.conventions</groupId>
-        <artifactId>gradle-enterprise-conventions-maven-extension</artifactId>
-        <version><<version>></version>
-    </extension>
-</extensions>
 ```

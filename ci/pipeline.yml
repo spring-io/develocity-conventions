@@ -106,31 +106,6 @@ jobs:
       ARTIFACTORY_SERVER: ((artifactory-server))
       ARTIFACTORY_USERNAME: ((artifactory-username))
       ARTIFACTORY_PASSWORD: ((artifactory-password))
-      BINTRAY_SUBJECT: ((bintray-subject))
-      BINTRAY_REPO: ((bintray-repo))
-      BINTRAY_USERNAME: ((bintray-username))
-      BINTRAY_API_KEY: ((bintray-api-key))
-- name: sync-to-maven-central
-  serial: true
-  plan:
-  - get: ci-image
-  - get: git-repo
-  - get: artifactory-repo
-    trigger: true
-    passed: [promote-release]
-    params:
-      download_artifacts: false
-      save_build_info: true
-  - task: sync-to-maven-central
-    image: ci-image
-    file: git-repo/ci/tasks/sync-to-maven-central.yml
-    params:
-      BINTRAY_SUBJECT: ((bintray-subject))
-      BINTRAY_REPO: ((bintray-repo))
-      BINTRAY_USERNAME: ((bintray-username))
-      BINTRAY_API_KEY: ((bintray-api-key))
-      SONATYPE_USER_TOKEN: ((sonatype-user-token))
-      SONATYPE_PASSWORD_TOKEN: ((sonatype-user-token-password))
   - task: generate-release-notes
     file: git-repo/ci/tasks/generate-release-notes.yml
     params:
@@ -146,6 +121,6 @@ groups:
 - name: "build"
   jobs: ["build"]
 - name: "release"
-  jobs: ["stage-release", "promote-release", "sync-to-maven-central"]
+  jobs: ["stage-release", "promote-release"]
 - name: "ci-image"
   jobs: ["build-ci-image"]
