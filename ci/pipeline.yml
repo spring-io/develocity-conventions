@@ -1,6 +1,6 @@
 resource_types:
 - name: artifactory-resource
-  type: docker-image
+  type: registry-image
   source:
     repository: springio/artifactory-resource
     tag: 0.0.12
@@ -27,7 +27,7 @@ resources:
     branch: ((branch))
     paths: ["ci/image/*"]
 - name: ci-image
-  type: docker-image
+  type: registry-image
   source:
     repository: ((docker-hub-organization))/gradle-enterprise-conventions-ci-image
     username: ((docker-hub-username))
@@ -43,11 +43,18 @@ resources:
 jobs:
 - name: build-ci-image
   plan:
+  - get: git-repo
   - get: ci-image-git-repo
     trigger: true
+  - do:
+    - task: build-ci-image
+      privileged: true
+      file: git-repo/ci/tasks/build-ci-image.yml
+      output_mapping:
+        image: ci-image
   - put: ci-image
     params:
-      build: ci-image-git-repo/ci/image/
+      image: ci-image/image.tar
 - name: build
   serial: true
   public: true
