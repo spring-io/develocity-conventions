@@ -82,6 +82,14 @@ class BuildScanConventionsTests {
 	}
 
 	@Test
+	void whenCircleBuildUrlEnvVarIsPresentThenBuildScanHasACiBuildLinkToIt() {
+		new BuildScanConventions(this.processRunner,
+				Collections.singletonMap("CIRCLE_BUILD_URL", "https://circleci.example.com/gh/org/project/123"))
+						.execute(this.buildScan);
+		assertThat(this.buildScan.links).containsEntry("CI build", "https://circleci.example.com/gh/org/project/123");
+	}
+
+	@Test
 	void whenJenkinsUrlAndBuildUrlEnvVarsArePresentThenBuildScanHasACiBuildLinkToBuildUrl() {
 		Map<String, String> env = new HashMap<>();
 		env.put("JENKINS_URL", "https://jenkins.example.com");
