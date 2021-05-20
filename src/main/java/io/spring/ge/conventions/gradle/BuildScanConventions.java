@@ -36,6 +36,8 @@ class BuildScanConventions implements Action<BuildScanExtension> {
 
 	private static final String BAMBOO_RESULTS_ENV_VAR = "bamboo_resultsUrl";
 
+	private static final String CIRCLECI_BUILD_URL_ENV_VAR = "CIRCLE_BUILD_URL";
+
 	private final Map<String, String> env;
 
 	private final ProcessRunner processRunner;
@@ -98,7 +100,7 @@ class BuildScanConventions implements Action<BuildScanExtension> {
 	}
 
 	private boolean isCi() {
-		if (isBamboo() || isConcourse() || isJenkins()) {
+		if (isBamboo() || isCircleCi() || isConcourse() || isJenkins()) {
 			return true;
 		}
 		return false;
@@ -106,6 +108,10 @@ class BuildScanConventions implements Action<BuildScanExtension> {
 
 	private boolean isBamboo() {
 		return this.env.containsKey(BAMBOO_RESULTS_ENV_VAR);
+	}
+
+	private boolean isCircleCi() {
+		return this.env.containsKey(CIRCLECI_BUILD_URL_ENV_VAR);
 	}
 
 	private boolean isConcourse() {
@@ -156,6 +162,9 @@ class BuildScanConventions implements Action<BuildScanExtension> {
 			if (hasText(buildUrl)) {
 				buildScan.link("CI build", buildUrl);
 			}
+		}
+		else if (isCircleCi()) {
+			buildScan.link("CI build", this.env.get(CIRCLECI_BUILD_URL_ENV_VAR));
 		}
 	}
 
