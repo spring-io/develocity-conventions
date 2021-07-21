@@ -3,7 +3,7 @@ plugins {
 	id "io.spring.javaformat" version "$javaFormatVersion"
 	id "java-gradle-plugin"
 	id "maven-publish"
-	id "io.spring.compatibility-test"
+	id "io.spring.compatibility-test" version "0.0.1"
 }
 
 description = "Gradle Enterprise Conventions Gradle plugin"
