@@ -27,7 +27,7 @@ dependencies {
 	compileOnly("com.gradle:gradle-enterprise-gradle-plugin:${gradleEnterprisePluginVersion}")
 
 	testImplementation("com.gradle:gradle-enterprise-gradle-plugin:${gradleEnterprisePluginVersion}")
-	testImplementation("org.assertj:assertj-core:3.11.1")
+	testImplementation("org.assertj:assertj-core:3.20.2")
 	testImplementation("org.junit.jupiter:junit-jupiter:5.7.2")
 	testImplementation("org.mockito:mockito-core:3.11.2")
 }
