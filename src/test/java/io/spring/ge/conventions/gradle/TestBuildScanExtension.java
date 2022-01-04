@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.function.Function;
 
 import com.gradle.scan.plugin.BuildResult;
+import com.gradle.scan.plugin.BuildScanCaptureSettings;
 import com.gradle.scan.plugin.BuildScanDataObfuscation;
 import com.gradle.scan.plugin.BuildScanExtension;
 import com.gradle.scan.plugin.PublishedBuildScan;
@@ -44,7 +45,7 @@ public final class TestBuildScanExtension implements BuildScanExtension {
 
 	final Map<String, String> links = new HashMap<>();
 
-	boolean captureTaskInputFiles;
+	final TestBuildScanCaptureSettings captureSettings = new TestBuildScanCaptureSettings();
 
 	boolean publishAlways;
 
@@ -95,8 +96,9 @@ public final class TestBuildScanExtension implements BuildScanExtension {
 	}
 
 	@Override
+	@Deprecated
 	public boolean isCaptureTaskInputFiles() {
-		return this.captureTaskInputFiles;
+		return this.captureSettings.isTaskInputFiles();
 	}
 
 	@Override
@@ -139,8 +141,9 @@ public final class TestBuildScanExtension implements BuildScanExtension {
 	}
 
 	@Override
+	@Deprecated
 	public void setCaptureTaskInputFiles(boolean capture) {
-		this.captureTaskInputFiles = capture;
+		this.captureSettings.setTaskInputFiles(capture);
 	}
 
 	@Override
@@ -178,6 +181,16 @@ public final class TestBuildScanExtension implements BuildScanExtension {
 		this.uploadInBackground = uploadInBackground;
 	}
 
+	@Override
+	public void capture(Action<? super BuildScanCaptureSettings> action) {
+		action.execute(this.captureSettings);
+	}
+
+	@Override
+	public BuildScanCaptureSettings getCapture() {
+		throw new UnsupportedOperationException();
+	}
+
 	static final class TestBuildScanDataObfuscation implements BuildScanDataObfuscation {
 
 		Function<? super List<InetAddress>, ? extends List<String>> ipAddressesObfuscator;
@@ -194,6 +207,42 @@ public final class TestBuildScanExtension implements BuildScanExtension {
 
 		@Override
 		public void username(Function<? super String, ? extends String> obfuscator) {
+			throw new UnsupportedOperationException();
+		}
+
+	}
+
+	static final class TestBuildScanCaptureSettings implements BuildScanCaptureSettings {
+
+		private boolean taskInputFiles;
+
+		@Override
+		public boolean isBuildLogging() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public boolean isTaskInputFiles() {
+			return this.taskInputFiles;
+		}
+
+		@Override
+		public boolean isTestLogging() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public void setBuildLogging(boolean capture) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public void setTaskInputFiles(boolean capture) {
+			this.taskInputFiles = capture;
+		}
+
+		@Override
+		public void setTestLogging(boolean capture) {
 			throw new UnsupportedOperationException();
 		}
 

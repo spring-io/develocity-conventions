@@ -56,19 +56,20 @@ class BuildScanConventions implements Action<BuildScanExtension> {
 	 * @param buildScan build scan to be configured
 	 */
 	@Override
+	@SuppressWarnings("deprecation")
 	public void execute(BuildScanExtension buildScan) {
-		buildScan.setCaptureTaskInputFiles(true);
 		buildScan.obfuscation((obfuscation) -> obfuscation.ipAddresses(
 				(addresses) -> addresses.stream().map((address) -> "0.0.0.0").collect(Collectors.toList())));
 		configurePublishing(buildScan);
 		tagBuildScan(buildScan);
 		buildScan.background(this::addGitMetadata);
 		addCiMetadata(buildScan);
+		buildScan.setUploadInBackground(!isCi());
 		try {
-			buildScan.setUploadInBackground(!isCi());
+			buildScan.capture((settings) -> settings.setTaskInputFiles(true));
 		}
 		catch (NoSuchMethodError ex) {
-			// GE Plugin version < 3.3. Continue
+			buildScan.setCaptureTaskInputFiles(true);
 		}
 	}
 

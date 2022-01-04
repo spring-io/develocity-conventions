@@ -42,7 +42,7 @@ class BuildScanConventionsTests {
 	@Test
 	void capturingOfTaskInputsIsEnabled() {
 		new BuildScanConventions(this.processRunner).execute(this.buildScan);
-		assertThat(this.buildScan.captureTaskInputFiles).isTrue();
+		assertThat(this.buildScan.captureSettings.isTaskInputFiles()).isTrue();
 	}
 
 	@Test
