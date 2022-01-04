@@ -109,7 +109,7 @@ pluginManagement {
 ```
 
 In the example above, `gradlePluginPortal()` is declared to allow other plugins to continue to be resolved from the portal.
-The second step in applying the plugin depends on whether you are using Gradle 5 or 6.
+The second step in applying the plugin depends on the version of Gradle that you are using.
 
 #### Gradle 5.x
 
@@ -124,7 +124,7 @@ plugins {
 }
 ```
 
-#### Gradle 6.x
+#### Gradle 6.x and 7.x
 
 The plugin should be applied in `settings.gradle`, alongside the `com.gradle.enterprise` plugin:
 
