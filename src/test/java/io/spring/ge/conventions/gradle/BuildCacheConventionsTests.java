@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2021 the original author or authors.
+ * Copyright 2020-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,6 +50,16 @@ class BuildCacheConventionsTests {
 		new BuildCacheConventions().execute(this.buildCache);
 		assertThat(this.buildCache.remote.isEnabled()).isTrue();
 		assertThat(this.buildCache.remote.getUrl()).isEqualTo(URI.create("https://ge.spring.io/cache/"));
+		assertThat(this.buildCache.remote.isPush()).isFalse();
+	}
+
+	@Test
+	void remoteCacheUrlCanBeConfigured() {
+		Map<String, String> env = new HashMap<>();
+		env.put("GRADLE_ENTERPRISE_CACHE_URL", "https://ge.example.com/cache/");
+		new BuildCacheConventions(env).execute(this.buildCache);
+		assertThat(this.buildCache.remote.isEnabled()).isTrue();
+		assertThat(this.buildCache.remote.getUrl()).isEqualTo(URI.create("https://ge.example.com/cache/"));
 		assertThat(this.buildCache.remote.isPush()).isFalse();
 	}
 

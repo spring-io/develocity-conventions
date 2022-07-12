@@ -11,7 +11,14 @@ When applied, the conventions will configure the build cache to:
 - Enable pulling from the remote cache.
 - Enable pushing to the remote cache if the required credentials are available.
 
-### Remote cache credentials
+### Remote cache
+
+#### URL
+
+By default, https://ge.spring.io/cache/ will be used as the remote cache.
+The URL can be configured using the `GRADLE_ENTERPRISE_CACHE_URL` environment variable.
+
+#### Credentials
 
 :rotating_light: **Credentials must not be configured in environments where pull requests are built.** :rotating_light:
 

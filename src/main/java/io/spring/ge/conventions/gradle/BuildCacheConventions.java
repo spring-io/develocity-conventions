@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2021 the original author or authors.
+ * Copyright 2020-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,7 +46,7 @@ public class BuildCacheConventions {
 		buildCache.local((local) -> local.setEnabled(true));
 		buildCache.remote(HttpBuildCache.class, (remote) -> {
 			remote.setEnabled(true);
-			remote.setUrl("https://ge.spring.io/cache/");
+			remote.setUrl(this.env.getOrDefault("GRADLE_ENTERPRISE_CACHE_URL", "https://ge.spring.io/cache/"));
 			String username = this.env.get("GRADLE_ENTERPRISE_CACHE_USERNAME");
 			String password = this.env.get("GRADLE_ENTERPRISE_CACHE_PASSWORD");
 			if (hasText(username) && hasText(password)) {
