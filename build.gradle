@@ -49,8 +49,8 @@ compatibilityTest {
 		gePlugin.groupId = 'com.gradle'
 		gePlugin.artifactId = 'gradle-enterprise-gradle-plugin'
 		gePlugin.versions = [
-			'3.8.1',
-			'3.9'
+			'3.9',
+			'3.10.2'
 		]
 	}
 }
