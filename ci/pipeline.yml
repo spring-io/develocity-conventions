@@ -102,13 +102,13 @@ jobs:
 - name: promote-release
   serial: true
   plan:
-  - get: ci-image
   - get: git-repo
     trigger: false
   - get: artifactory-repo
     trigger: false
     passed: [stage-release]
     params:
+      download_artifacts: true
       save_build_info: true
   - task: promote
     image: ci-image
@@ -118,6 +118,10 @@ jobs:
       ARTIFACTORY_SERVER: ((artifactory-server))
       ARTIFACTORY_USERNAME: ((artifactory-username))
       ARTIFACTORY_PASSWORD: ((artifactory-password))
+      SONATYPE_USERNAME: ((s01-user-token))
+      SONATYPE_PASSWORD: ((s01-user-token-password))
+      SONATYPE_URL: ((sonatype-url))
+      SONATYPE_STAGING_PROFILE_ID: ((sonatype-staging-profile-id))
   - task: generate-changelog
     file: git-repo/ci/tasks/generate-changelog.yml
     params:
