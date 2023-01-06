@@ -75,6 +75,8 @@ jobs:
       file: git-repo/ci/tasks/build-project.yml
   - put: artifactory-repo
     params: &artifactory-params
+      signing_key: ((signing-key))
+      signing_passphrase: ((signing-passphrase))
       repo: libs-snapshot-local
       build_number: "${BUILD_ID}"
       folder: distribution-repository
