@@ -27,7 +27,7 @@ The necessary credentials can be provided using the `GRADLE_ENTERPRISE_CACHE_USE
 
 #### Bamboo
 
-The username and password environment variables should be set using `${bamboo.ge.cache.username}` and `${bamboo.ge.cache.password}` respectively.
+The username and password environment variables should be set using `${bamboo.gradle_enterprise_cache_user}` and `${bamboo.gradle_enterprise_cache_password}` respectively.
 
 #### Concourse
 
