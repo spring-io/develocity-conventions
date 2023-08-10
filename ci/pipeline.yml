@@ -9,6 +9,8 @@ resource_types:
   source:
     repository: concourse/github-release-resource
     tag: 1.7.2
+    username: ((docker-hub-username))
+    password: ((docker-hub-password))
 resources:
 - name: git-repo
   type: git
