@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2021 the original author or authors.
+ * Copyright 2020-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,15 +61,17 @@ public class GradleEnterpriseConventionsPlugin implements Plugin<Object> {
 					settings.getRootDir());
 		});
 		if (settings.getStartParameter().isBuildCacheEnabled()) {
-			settings.buildCache(
-					(buildCacheConfiguration) -> new BuildCacheConventions().execute(buildCacheConfiguration));
+			settings
+				.buildCache((buildCacheConfiguration) -> new BuildCacheConventions().execute(buildCacheConfiguration));
 		}
 	}
 
 	private void apply(Project project) {
-		project.getPlugins().withId("com.gradle.build-scan",
-				(plugin) -> configureBuildScanConventions(project.getExtensions().getByType(BuildScanExtension.class),
-						project.getGradle().getStartParameter(), project.getRootDir()));
+		project.getPlugins()
+			.withId("com.gradle.build-scan",
+					(plugin) -> configureBuildScanConventions(
+							project.getExtensions().getByType(BuildScanExtension.class),
+							project.getGradle().getStartParameter(), project.getRootDir()));
 	}
 
 	private void configureBuildScanConventions(BuildScanExtension buildScan, StartParameter startParameter,

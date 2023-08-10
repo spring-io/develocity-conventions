@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2021 the original author or authors.
+ * Copyright 2020-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,8 +58,8 @@ class BuildScanConventions implements Action<BuildScanExtension> {
 	@Override
 	@SuppressWarnings("deprecation")
 	public void execute(BuildScanExtension buildScan) {
-		buildScan.obfuscation((obfuscation) -> obfuscation.ipAddresses(
-				(addresses) -> addresses.stream().map((address) -> "0.0.0.0").collect(Collectors.toList())));
+		buildScan.obfuscation((obfuscation) -> obfuscation
+			.ipAddresses((addresses) -> addresses.stream().map((address) -> "0.0.0.0").collect(Collectors.toList())));
 		configurePublishing(buildScan);
 		tagBuildScan(buildScan);
 		buildScan.background(this::addGitMetadata);

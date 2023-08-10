@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2021 the original author or authors.
+ * Copyright 2020-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -140,8 +140,8 @@ class GradleEnterpriseConventionsPluginIntegrationTests {
 			writer.println("}");
 			writer.println("task verifyBuildCacheConfig {");
 			writer.println("    doFirst {");
-			writer.println(
-					"        println \"Build cache remote: ${project.ext['settings'].buildCache?.remote?.url}\"");
+			writer
+				.println("        println \"Build cache remote: ${project.ext['settings'].buildCache?.remote?.url}\"");
 			writer.println("    }");
 			writer.println("}");
 		});
@@ -171,8 +171,12 @@ class GradleEnterpriseConventionsPluginIntegrationTests {
 		List<File> classpath = Arrays.asList(new File("bin/main"), new File("build/classes/java/main"),
 				new File("build/resources/main"),
 				new File(GradleEnterprisePlugin.class.getProtectionDomain().getCodeSource().getLocation().getFile()));
-		return GradleRunner.create().withGradleVersion(gradleVersion).withProjectDir(projectDir)
-				.withPluginClasspath(classpath).withArguments(arguments).build();
+		return GradleRunner.create()
+			.withGradleVersion(gradleVersion)
+			.withProjectDir(projectDir)
+			.withPluginClasspath(classpath)
+			.withArguments(arguments)
+			.build();
 	}
 
 }

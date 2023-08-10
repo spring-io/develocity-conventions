@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2021 the original author or authors.
+ * Copyright 2020-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,7 +50,7 @@ class BuildScanConventionsTests {
 		new BuildScanConventions(this.processRunner).execute(this.buildScan);
 		assertThat(this.buildScan.obfuscation.ipAddressesObfuscator).isNotNull();
 		List<String> obfuscatedAddresses = this.buildScan.obfuscation.ipAddressesObfuscator
-				.apply(Arrays.asList(InetAddress.getByName("10.0.0.1"), InetAddress.getByName("10.0.0.2")));
+			.apply(Arrays.asList(InetAddress.getByName("10.0.0.1"), InetAddress.getByName("10.0.0.2")));
 		assertThat(obfuscatedAddresses).containsExactly("0.0.0.0", "0.0.0.0");
 	}
 
@@ -70,14 +70,16 @@ class BuildScanConventionsTests {
 	@Test
 	void whenBambooResultEnvVarIsPresentThenBuildScanIsTaggedWithCiNotLocal() {
 		new BuildScanConventions(this.processRunner,
-				Collections.singletonMap("bamboo_resultsUrl", "https://bamboo.exampl.com")).execute(this.buildScan);
+				Collections.singletonMap("bamboo_resultsUrl", "https://bamboo.exampl.com"))
+			.execute(this.buildScan);
 		assertThat(this.buildScan.tags).contains("CI").doesNotContain("Local");
 	}
 
 	@Test
 	void whenBambooResultEnvVarIsPresentThenBuildScanHasACiBuildLinkToIt() {
 		new BuildScanConventions(this.processRunner,
-				Collections.singletonMap("bamboo_resultsUrl", "https://bamboo.example.com")).execute(this.buildScan);
+				Collections.singletonMap("bamboo_resultsUrl", "https://bamboo.example.com"))
+			.execute(this.buildScan);
 		assertThat(this.buildScan.links).containsEntry("CI build", "https://bamboo.example.com");
 	}
 
@@ -85,7 +87,7 @@ class BuildScanConventionsTests {
 	void whenCircleBuildUrlEnvVarIsPresentThenBuildScanHasACiBuildLinkToIt() {
 		new BuildScanConventions(this.processRunner,
 				Collections.singletonMap("CIRCLE_BUILD_URL", "https://circleci.example.com/gh/org/project/123"))
-						.execute(this.buildScan);
+			.execute(this.buildScan);
 		assertThat(this.buildScan.links).containsEntry("CI build", "https://circleci.example.com/gh/org/project/123");
 	}
 
@@ -107,7 +109,8 @@ class BuildScanConventionsTests {
 	@Test
 	void whenJenkinsUrlEnvVarIsPresentThenBuildScanIsTaggedWithCiNotLocal() {
 		new BuildScanConventions(this.processRunner,
-				Collections.singletonMap("JENKINS_URL", "https://jenkins.example.com")).execute(this.buildScan);
+				Collections.singletonMap("JENKINS_URL", "https://jenkins.example.com"))
+			.execute(this.buildScan);
 		assertThat(this.buildScan.tags).contains("CI").doesNotContain("Local");
 	}
 
@@ -132,7 +135,7 @@ class BuildScanConventionsTests {
 	@Test
 	void whenBranchEnvVarIsPresentThenBuildScanIsTaggedAndConfiguredWithCustomValue() {
 		new BuildScanConventions(this.processRunner, Collections.singletonMap("BRANCH", "1.1.x"))
-				.execute(this.buildScan);
+			.execute(this.buildScan);
 		assertThat(this.buildScan.tags).contains("1.1.x");
 		assertThat(this.buildScan.values).containsEntry("Git branch", "1.1.x");
 	}
