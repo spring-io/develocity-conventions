@@ -75,7 +75,7 @@ java {
 checkstyle {
 	def archive = configurations.checkstyle.filter { it.name.startsWith("spring-javaformat-checkstyle")}
 	config = resources.text.fromArchiveEntry(archive, "io/spring/javaformat/checkstyle/checkstyle.xml")
-	toolVersion = 8.44
+	toolVersion = 9.3
 }
 
 tasks.withType(GenerateModuleMetadata).all {
