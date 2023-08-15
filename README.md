@@ -1,4 +1,4 @@
-# Gradle Enterprise Conventions
+# Gradle Enterprise Conventions [![Revved up by Gradle Enterprise](https://img.shields.io/badge/Revved%20up%20by-Gradle%20Enterprise-06A0CE?logo=Gradle&labelColor=02303A)](https://ge.spring.io/scans?search.rootProjectNames=gradle-enterprise-conventions-gradle-plugin)
 
 Conventions for Gradle projects that use the Gradle Enterprise instance hosted at [ge.spring.io](https://ge.spring.io).
 
