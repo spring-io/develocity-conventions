@@ -1,4 +1,4 @@
-FROM ubuntu:focal-20220531
+FROM ubuntu:jammy-20231211.1
 
 RUN apt-get update
 RUN apt-get install --no-install-recommends -y ca-certificates net-tools git curl jq
