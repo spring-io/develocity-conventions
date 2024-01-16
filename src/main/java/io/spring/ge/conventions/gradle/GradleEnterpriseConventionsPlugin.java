@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2023 the original author or authors.
+ * Copyright 2020-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -76,32 +76,42 @@ public class GradleEnterpriseConventionsPlugin implements Plugin<Object> {
 
 	private void configureBuildScanConventions(BuildScanExtension buildScan, StartParameter startParameter,
 			File rootDir) {
-		if (!startParameter.isNoBuildScan()) {
-			ProcessOperationsProcessRunner processRunner = new ProcessOperationsProcessRunner(
-					new WorkingDirectoryProcessOperations(this.processOperations, rootDir));
-			if (startParameter.isBuildScan()) {
-				new AnonymousPublicationBuildScanConventions(processRunner) {
+		if (startParameter.isNoBuildScan() || containsPropertiesTask(startParameter)) {
+			return;
+		}
+		ProcessOperationsProcessRunner processRunner = new ProcessOperationsProcessRunner(
+				new WorkingDirectoryProcessOperations(this.processOperations, rootDir));
+		if (startParameter.isBuildScan()) {
+			new AnonymousPublicationBuildScanConventions(processRunner) {
 
-					@Override
-					protected String getJdkVersion() {
-						String toolchainVersion = startParameter.getProjectProperties().get("toolchainVersion");
-						return (toolchainVersion != null) ? toolchainVersion : super.getJdkVersion();
-					}
+				@Override
+				protected String getJdkVersion() {
+					String toolchainVersion = startParameter.getProjectProperties().get("toolchainVersion");
+					return (toolchainVersion != null) ? toolchainVersion : super.getJdkVersion();
+				}
 
-				}.execute(buildScan);
-			}
-			else {
-				new BuildScanConventions(processRunner) {
+			}.execute(buildScan);
+		}
+		else {
+			new BuildScanConventions(processRunner) {
 
-					@Override
-					protected String getJdkVersion() {
-						String toolchainVersion = startParameter.getProjectProperties().get("toolchainVersion");
-						return (toolchainVersion != null) ? toolchainVersion : super.getJdkVersion();
-					}
+				@Override
+				protected String getJdkVersion() {
+					String toolchainVersion = startParameter.getProjectProperties().get("toolchainVersion");
+					return (toolchainVersion != null) ? toolchainVersion : super.getJdkVersion();
+				}
 
-				}.execute(buildScan);
+			}.execute(buildScan);
+		}
+	}
+
+	private boolean containsPropertiesTask(StartParameter startParameter) {
+		for (String taskName : startParameter.getTaskNames()) {
+			if (taskName.equals("properties") || taskName.endsWith(":properties")) {
+				return true;
 			}
 		}
+		return false;
 	}
 
 }

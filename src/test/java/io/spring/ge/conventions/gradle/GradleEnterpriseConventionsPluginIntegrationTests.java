@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2023 the original author or authors.
+ * Copyright 2020-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -67,6 +67,24 @@ class GradleEnterpriseConventionsPluginIntegrationTests {
 	}
 
 	@Test
+	void givenGradle6WhenThePluginIsAppliedAndPropertiesTaskIsExecutedThenBuildScanConventionsAreNotApplied(
+			@TempDir File projectDir) {
+		prepareGradle6Project(projectDir);
+		BuildResult result = build(projectDir, "6.0.1", "properties", "verifyBuildScanConfig", "--no-scan");
+		assertThat(result.getOutput()).contains("Build scan server: null");
+		assertThat(result.getOutput()).contains("Capture task input files: false");
+	}
+
+	@Test
+	void givenGradle6MulitProjectBuildWhenThePluginIsAppliedAndPropertiesTaskIsExecutedThenBuildScanConventionsAreNotApplied(
+			@TempDir File projectDir) {
+		prepareGradle6MultiProject(projectDir);
+		BuildResult result = build(projectDir, "6.0.1", "sub:properties", "sub:verifyBuildScanConfig", "--no-scan");
+		assertThat(result.getOutput()).contains("Build scan server: null");
+		assertThat(result.getOutput()).contains("Capture task input files: false");
+	}
+
+	@Test
 	void givenGradle6WhenThePluginIsAppliedAndScanIsSpecifiedThenServerIsNotCustomized(@TempDir File projectDir) {
 		prepareGradle6Project(projectDir);
 		BuildResult result = build(projectDir, "6.0.1", "verifyBuildScanConfig", "--scan");
@@ -95,6 +113,15 @@ class GradleEnterpriseConventionsPluginIntegrationTests {
 			@TempDir File projectDir) {
 		prepareGradle5Project(projectDir);
 		BuildResult result = build(projectDir, "5.6.4", "verifyBuildScanConfig", "--no-scan");
+		assertThat(result.getOutput()).contains("Build scan server: null");
+		assertThat(result.getOutput()).contains("Capture task input files: false");
+	}
+
+	@Test
+	void givenGradle5WhenThePluginIsAppliedAndPropertiesTaskIsExecutedThenBuildScanConventionsAreNotApplied(
+			@TempDir File projectDir) {
+		prepareGradle5Project(projectDir);
+		BuildResult result = build(projectDir, "5.6.4", "properties", "verifyBuildScanConfig", "--no-scan");
 		assertThat(result.getOutput()).contains("Build scan server: null");
 		assertThat(result.getOutput()).contains("Capture task input files: false");
 	}
@@ -147,7 +174,34 @@ class GradleEnterpriseConventionsPluginIntegrationTests {
 		});
 	}
 
+	private void prepareGradle6MultiProject(File projectDir) {
+		write(new File(projectDir, "gradle.properties"), (writer) -> writer.println("org.gradle.caching=true"));
+		write(new File(projectDir, "settings.gradle"), (writer) -> {
+			writer.println("plugins {");
+			writer.println("    id 'com.gradle.enterprise'");
+			writer.println("    id 'io.spring.ge.conventions' version '" + version() + "'");
+			writer.println("}");
+			writer.println("include 'sub'");
+			writer.println("gradle.afterProject { project -> project.ext['settings'] = settings }");
+		});
+		write(new File(new File(projectDir, "sub"), "build.gradle"), (writer) -> {
+			writer.println("task verifyBuildScanConfig {");
+			writer.println("    doFirst {");
+			writer.println("        println \"Build scan server: ${buildScan.server}\"");
+			writer.println("        println \"Capture task input files: ${buildScan.captureTaskInputFiles}\"");
+			writer.println("    }");
+			writer.println("}");
+			writer.println("task verifyBuildCacheConfig {");
+			writer.println("    doFirst {");
+			writer
+				.println("        println \"Build cache remote: ${project.ext['settings'].buildCache?.remote?.url}\"");
+			writer.println("    }");
+			writer.println("}");
+		});
+	}
+
 	private void write(File file, Consumer<PrintWriter> consumer) {
+		file.getParentFile().mkdirs();
 		try (PrintWriter writer = new PrintWriter(new FileWriter(file))) {
 			consumer.accept(writer);
 		}
