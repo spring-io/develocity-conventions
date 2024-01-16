@@ -131,7 +131,7 @@ plugins {
 }
 ```
 
-#### Gradle 6.x and 7.x
+#### Gradle 6.x and later
 
 The plugin should be applied in `settings.gradle`, alongside the `com.gradle.enterprise` plugin:
 
