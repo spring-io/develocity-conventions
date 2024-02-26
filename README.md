@@ -31,7 +31,7 @@ The username and password environment variables should be set using `${bamboo.gr
 
 #### Concourse
 
-The username and password environment variables should be set using `((gradle_enterprise_cache_user.username))` and `((gradle_enterprise_cache_user.password))` from CredHub respectively.
+The username and password environment variables should be set using `((gradle_enterprise_cache_user.username))` and `((gradle_enterprise_cache_user.password))` from Vault respectively.
 
 #### GitHub Actions
 
