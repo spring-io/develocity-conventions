@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2023 the original author or authors.
+ * Copyright 2020-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -101,7 +101,7 @@ class BuildScanConventions implements Action<BuildScanExtension> {
 	}
 
 	private boolean isCi() {
-		if (isBamboo() || isCircleCi() || isConcourse() || isJenkins()) {
+		if (isBamboo() || isCircleCi() || isConcourse() || isJenkins() || isGitHubActions()) {
 			return true;
 		}
 		return false;
@@ -121,6 +121,10 @@ class BuildScanConventions implements Action<BuildScanExtension> {
 
 	private boolean isJenkins() {
 		return this.env.containsKey("JENKINS_URL");
+	}
+
+	private boolean isGitHubActions() {
+		return this.env.containsKey("GITHUB_ACTIONS");
 	}
 
 	private void tagJdk(BuildScanExtension buildScan) {
@@ -166,6 +170,12 @@ class BuildScanConventions implements Action<BuildScanExtension> {
 		}
 		else if (isCircleCi()) {
 			buildScan.link("CI build", this.env.get(CIRCLECI_BUILD_URL_ENV_VAR));
+		}
+		else if (isGitHubActions()) {
+			String server = this.env.get("GITHUB_SERVER_URL");
+			String repository = this.env.get("GITHUB_REPOSITORY");
+			String runId = this.env.get("GITHUB_RUN_ID");
+			buildScan.link("CI build", server + "/" + repository + "/actions/runs/" + runId);
 		}
 	}
 

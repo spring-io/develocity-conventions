@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2023 the original author or authors.
+ * Copyright 2020-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -112,6 +112,25 @@ class BuildScanConventionsTests {
 				Collections.singletonMap("JENKINS_URL", "https://jenkins.example.com"))
 			.execute(this.buildScan);
 		assertThat(this.buildScan.tags).contains("CI").doesNotContain("Local");
+	}
+
+	@Test
+	void whenGitHubActionsEnvVarIsPresentThenBuildScanIsTaggedWithCiNotLocal() {
+		new BuildScanConventions(this.processRunner, Collections.singletonMap("GITHUB_ACTIONS", "true"))
+			.execute(this.buildScan);
+		assertThat(this.buildScan.tags).contains("CI").doesNotContain("Local");
+	}
+
+	@Test
+	void whenGitHubActionsEnvVarsArePresentThenBuildScanHasACiBuildLinkToIt() {
+		Map<String, String> env = new HashMap<>();
+		env.put("GITHUB_ACTIONS", "true");
+		env.put("GITHUB_SERVER_URL", "https://github.com");
+		env.put("GITHUB_REPOSITORY", "spring-projects/spring-boot");
+		env.put("GITHUB_RUN_ID", "1234567890");
+		new BuildScanConventions(this.processRunner, env).execute(this.buildScan);
+		assertThat(this.buildScan.links).containsEntry("CI build",
+				"https://github.com/spring-projects/spring-boot/actions/runs/1234567890");
 	}
 
 	@Test

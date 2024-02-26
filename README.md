@@ -33,6 +33,10 @@ The username and password environment variables should be set using `${bamboo.gr
 
 The username and password environment variables should be set using `((gradle_enterprise_cache_user.username))` and `((gradle_enterprise_cache_user.password))` from CredHub respectively.
 
+#### GitHub Actions
+
+The username and password environment variables should be set using the `GRADLE_ENTERPRISE_CACHE_USER` and `GRADLE_ENTERPRISE_CACHE_PASSWORD` organization secrets respectively.
+
 #### Jenkins
 
 The username and password environment variables should be set using the `gradle_enterprise_cache_user` username with password credential.
@@ -53,7 +57,7 @@ The build scans will be customized to:
     - `Git status` when the working copy is dirty.
       The value is the output of `git status --porcelain`.
  - Add links:
-    - `CI build` when building on Bamboo or Jenkins, linking to the build on the CI server.
+    - `CI build` when building on Bamboo, GitHub Actions, or Jenkins, linking to the build on the CI server.
     - `Git commit build scans`, linking to scans for other builds of the same git commit.
  - Enable capturing of task (Gradle) or goal (Maven) input files
  - Upload build scans in the foreground when running on CI
@@ -73,7 +77,11 @@ The environment variable should be set to `${bamboo.gradle_enterprise_secret_acc
 
 #### Concourse
 
-The environment variable should be set using `((gradle_enterprise_secret_access_key))` from CredHub.
+The environment variable should be set using `((gradle_enterprise_secret_access_key))` from Vault.
+
+#### GitHub Actions
+
+The environment variable should be set using the `GRADLE_ENTERPRISE_SECRET_ACCESS_KEY` organization secret.
 
 #### Jenkins
 
