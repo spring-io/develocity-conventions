@@ -54,7 +54,7 @@ class GradleEnterpriseConventionsPluginIntegrationTests {
 	void whenThePluginIsAppliedThenBuildCacheConventionsAreApplied(@TempDir File projectDir) {
 		prepareProject(projectDir);
 		BuildResult result = build(projectDir, "6.0.1", "verifyBuildCacheConfig");
-		assertThat(result.getOutput()).contains("Build cache remote: https://ge.spring.io/cache/");
+		assertThat(result.getOutput()).contains("Build cache server: https://ge.spring.io");
 	}
 
 	@Test
@@ -95,7 +95,7 @@ class GradleEnterpriseConventionsPluginIntegrationTests {
 	void whenThePluginIsAppliedAndBuildCacheIsDisabledThenBuildCacheConventionsAreNotApplied(@TempDir File projectDir) {
 		prepareProject(projectDir);
 		BuildResult result = build(projectDir, "6.0.1", "verifyBuildCacheConfig", "--no-build-cache");
-		assertThat(result.getOutput()).contains("Build cache remote: null");
+		assertThat(result.getOutput()).contains("Build cache server: null");
 	}
 
 	private void prepareProject(File projectDir) {
@@ -116,8 +116,8 @@ class GradleEnterpriseConventionsPluginIntegrationTests {
 			writer.println("}");
 			writer.println("task verifyBuildCacheConfig {");
 			writer.println("    doFirst {");
-			writer
-				.println("        println \"Build cache remote: ${project.ext['settings'].buildCache?.remote?.url}\"");
+			writer.println(
+					"        println \"Build cache server: ${project.ext['settings'].buildCache?.remote?.server}\"");
 			writer.println("    }");
 			writer.println("}");
 		});
@@ -142,8 +142,8 @@ class GradleEnterpriseConventionsPluginIntegrationTests {
 			writer.println("}");
 			writer.println("task verifyBuildCacheConfig {");
 			writer.println("    doFirst {");
-			writer
-				.println("        println \"Build cache remote: ${project.ext['settings'].buildCache?.remote?.url}\"");
+			writer.println(
+					"        println \"Build cache server: ${project.ext['settings'].buildCache?.remote?.server}\"");
 			writer.println("    }");
 			writer.println("}");
 		});

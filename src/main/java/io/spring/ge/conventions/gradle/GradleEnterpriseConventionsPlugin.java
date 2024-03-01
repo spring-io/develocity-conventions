@@ -45,14 +45,13 @@ public class GradleEnterpriseConventionsPlugin implements Plugin<Settings> {
 
 	@Override
 	public void apply(Settings settings) {
-		settings.getPlugins().withType(DevelocityPlugin.class, (plugin) -> {
-			DevelocityConfiguration extension = settings.getExtensions().getByType(DevelocityConfiguration.class);
-			configureBuildScanConventions(extension, extension.getBuildScan(), settings.getStartParameter(),
-					settings.getRootDir());
-		});
+		DevelocityConfiguration extension = settings.getExtensions().getByType(DevelocityConfiguration.class);
+		settings.getPlugins()
+			.withType(DevelocityPlugin.class, (plugin) -> configureBuildScanConventions(extension,
+					extension.getBuildScan(), settings.getStartParameter(), settings.getRootDir()));
 		if (settings.getStartParameter().isBuildCacheEnabled()) {
-			settings
-				.buildCache((buildCacheConfiguration) -> new BuildCacheConventions().execute(buildCacheConfiguration));
+			settings.buildCache((buildCacheConfiguration) -> new BuildCacheConventions(extension.getBuildCache())
+				.execute(buildCacheConfiguration));
 		}
 	}
 

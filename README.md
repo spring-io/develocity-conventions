@@ -7,39 +7,18 @@ Conventions for Gradle projects that use the Gradle Enterprise instance hosted a
 When applied, the conventions will configure the build cache to:
 
 - Enable local caching.
-- Use https://ge.spring.io/cache/ as the remote cache.
+- Use https://ge.spring.io as the remote cache server.
 - Enable pulling from the remote cache.
-- Enable pushing to the remote cache if the required credentials are available.
+- Enable pushing to the remote cache when a CI environment is detected and the required access token is available.
 
 ### Remote cache
 
 #### URL
 
-By default, https://ge.spring.io/cache/ will be used as the remote cache.
-The URL can be configured using the `GRADLE_ENTERPRISE_CACHE_URL` environment variable.
-
-#### Credentials
-
-:rotating_light: **Credentials must not be configured in environments where pull requests are built.** :rotating_light:
-
-Pushing to the remote cache requires authentication.
-The necessary credentials can be provided using the `GRADLE_ENTERPRISE_CACHE_USERNAME` and `GRADLE_ENTERPRISE_CACHE_PASSWORD` environment variables.
-
-#### Bamboo
-
-The username and password environment variables should be set using `${bamboo.gradle_enterprise_cache_user}` and `${bamboo.gradle_enterprise_cache_password}` respectively.
-
-#### Concourse
-
-The username and password environment variables should be set using `((gradle_enterprise_cache_user.username))` and `((gradle_enterprise_cache_user.password))` from Vault respectively.
-
-#### GitHub Actions
-
-The username and password environment variables should be set using the `GRADLE_ENTERPRISE_CACHE_USER` and `GRADLE_ENTERPRISE_CACHE_PASSWORD` organization secrets respectively.
-
-#### Jenkins
-
-The username and password environment variables should be set using the `gradle_enterprise_cache_user` username with password credential.
+By default, https://ge.spring.io will be used as the remote cache server.
+The server can be configured using the `GRADLE_ENTERPRISE_CACHE_SERVER` environment variable.
+For backwards compatibility, `GRADLE_ENTERPRISE_CACHE_URL` is also supported for a limited time.
+`/cache/` is removed from the end of the URL and the remainder is used to configure the remote cache server.
 
 ## Build scan conventions
 
@@ -62,14 +41,23 @@ The build scans will be customized to:
  - Enable capturing of file fingerprints
  - Upload build scans in the foreground when running on CI
 
-### Build scan publishing credentials
+### Git branch names
+
+`git rev-parse --abbrev-ref HEAD` is used to determine the name of the current branch.
+This does not work on Concourse as its git resource places the repository in a detached head state.
+To work around this, an environment variable named `BRANCH` can be set on the task to provide the name of the branch.
+
+### Anonymous publication
+
+When using Gradle, build scans can be published anonymously to scans.gradle.com by running the build with `--scan`.
+
+## Authentication
 
 :rotating_light: **Credentials must not be configured in environments where pull requests are built.** :rotating_light:
 
-Publishing to [ge.spring.io](https://ge.spring.io) requires authentication via an access key.
+Publishing build scans and pushing to the remote cache requires authentication via an access key.
+Additionally, pushing to the remote cache also requires that a CI environment be detected.
 When running on CI, the access key should be made available via the `GRADLE_ENTERPRISE_ACCESS_KEY` environment variable.
-
-When using Gradle, build scans can be published anonymously to scans.gradle.com by running the build with `--scan`.
 
 #### Bamboo
 
@@ -91,13 +79,7 @@ The environment variable should be set using the `gradle_enterprise_secret_acces
 
 An access key can be provisioned by running `./gradlew provisionGradleEnterpriseAccessKey` once the project has been configured to use this plugin.
 
-### Git branch names
-
-`git rev-parse --abbrev-ref HEAD` is used to determine the name of the current branch.
-This does not work on Concourse as its git resource places the repository in a detached head state.
-To work around this, an environment variable named `BRANCH` can be set on the task to provide the name of the branch.
-
-### Detecting CI
+## Detecting CI
 
 Bamboo is detected by looking for an environment variable named `bamboo_resultsUrl`.
 
