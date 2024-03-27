@@ -135,7 +135,7 @@ class BuildScanConventionsTests {
 
 	@Test
 	void whenNoCiIndicatorsArePresentThenBuildScanIsTaggedWithLocalNotCi() {
-		new BuildScanConventions(this.processRunner).execute(this.buildScan);
+		new BuildScanConventions(this.processRunner, Collections.emptyMap()).execute(this.buildScan);
 		assertThat(this.buildScan.tags).contains("Local").doesNotContain("CI");
 	}
 
@@ -195,7 +195,7 @@ class BuildScanConventionsTests {
 
 	@Test
 	void whenBuildingLocallyThenBackgroundUploadIsEnabled() {
-		new BuildScanConventions(this.processRunner).execute(this.buildScan);
+		new BuildScanConventions(this.processRunner, Collections.emptyMap()).execute(this.buildScan);
 		assertThat(this.buildScan.uploadInBackground).isTrue();
 	}
 
