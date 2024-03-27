@@ -28,7 +28,7 @@ jobs:
           echo 'org.gradle.daemon=false' >> $HOME/.gradle/gradle.properties
       - name: Build and publish
         id: build
-        run: ./gradlew -PdistributionRepository=$(pwd)/deployment-repository build publishAllPublicationsToDistributionRepository
+        run: ./gradlew -PdistributionRepository=$(pwd)/deployment-repository build publishAllPublicationsToDeploymentRepository
       - name: Deploy
         uses: spring-io/artifactory-deploy-action@26bbe925a75f4f863e1e529e85be2d0093cac116 # v0.0.1
         with:
