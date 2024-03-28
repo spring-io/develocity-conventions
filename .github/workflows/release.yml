@@ -59,6 +59,8 @@ jobs:
       - build-and-stage-release
     runs-on: ubuntu-latest
     steps:
+      - name: Check out code
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
       - name: Set up JFrog CLI
         uses: jfrog/setup-jfrog-cli@d82fe26823e1f25529250895d5673f65b02af085 # v4.0.1
         env:
