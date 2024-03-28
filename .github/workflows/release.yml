@@ -64,7 +64,7 @@ jobs:
         env:
           JF_ENV_SPRING: ${{ secrets.JF_ARTIFACTORY_SPRING }}
       - name: Download release artifacts
-        run: jf rt download --spec .github/release-artifacts.spec --spec-vars 'buildName=${{ format('gradle-enterprise-conventions-{0}', needs.get-version.outputs.version }};buildNumber=${{ github.run_number }}'
+        run: jf rt download --spec .github/release-artifacts.spec --spec-vars 'buildName=${{ format('gradle-enterprise-conventions-{0}', needs.get-version.outputs.version) }};buildNumber=${{ github.run_number }}'
       - name: Sync
         uses: spring-io/nexus-sync-action@42477a2230a2f694f9eaa4643fa9e76b99b7ab84 # v0.0.1
         with:
@@ -74,7 +74,7 @@ jobs:
           create: true
           upload: true
           close: true
-          release: false
+          release: true
           generate-checksums: true
   promote-release:
     name: Promote release
