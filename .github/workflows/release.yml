@@ -1,0 +1,109 @@
+name: Release
+on:
+  push:
+    tags:
+      - v[0-9]+.[0-9+].[0-9]+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+jobs:
+  get-version:
+    name: Get version from tag
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get version from tag
+        id: version-from-tag
+        run: |
+          version=$(echo ${{ github.ref_name }} | cut -c 2-)
+          echo "version=$version" >> $GITHUB_OUTPUT
+    outputs:
+      version: ${{ steps.version-from-tag.outputs.version }}
+  build-and-stage-release:
+    if: ${{ github.repository == 'spring-io/gradle-enterprise-conventions' }}
+    name: Build and stage release
+    needs: get-version
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Java
+        uses: actions/setup-java@99b8673ff64fbf99d8d325f52d9a5bdedb8483e9 # v4.2.1
+        with:
+          distribution: 'liberica'
+          java-version: 8
+      - name: Check out code
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@417ae3ccd767c252f5661f1ace9f835f9654f2b5 # v3.1.0
+      - name: Configure Gradle properties
+        shell: bash
+        run: |
+          mkdir -p $HOME/.gradle
+          echo 'systemProp.org.gradle.internal.launcher.welcomeMessageEnabled=false' >> $HOME/.gradle/gradle.properties
+          echo 'org.gradle.daemon=false' >> $HOME/.gradle/gradle.properties
+      - name: Build and publish release
+        id: build
+        run: ./gradlew -PdistributionRepository=$(pwd)/deployment-repository build publishAllPublicationsToDeploymentRepository
+      - name: Stage
+        uses: spring-io/artifactory-deploy-action@26bbe925a75f4f863e1e529e85be2d0093cac116 # v0.0.1
+        with:
+          uri: 'https://repo.spring.io'
+          username: ${{ secrets.ARTIFACTORY_USERNAME }}
+          password: ${{ secrets.ARTIFACTORY_PASSWORD }}
+          build-name: ${{ format('gradle-enterprise-conventions-{0}', needs.get-version.outputs.version)}}
+          repository: 'libs-staging-local'
+          folder: 'deployment-repository'
+          signing-key: ${{ secrets.GPG_PRIVATE_KEY }}
+          signing-passphrase: ${{ secrets.GPG_PASSPHRASE }}
+  sync-to-maven-central:
+    name: Sync to Maven Central
+    needs:
+      - get-version
+      - build-and-stage-release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up JFrog CLI
+        uses: jfrog/setup-jfrog-cli@d82fe26823e1f25529250895d5673f65b02af085 # v4.0.1
+        env:
+          JF_ENV_SPRING: ${{ secrets.JF_ARTIFACTORY_SPRING }}
+      - name: Download release artifacts
+        run: jf rt download --spec .github/release-artifacts.spec --spec-vars 'buildName=${{ format('gradle-enterprise-conventions-{0}', needs.get-version.outputs.version }};buildNumber=${{ github.run_number }}'
+      - name: Sync
+        uses: spring-io/nexus-sync-action@42477a2230a2f694f9eaa4643fa9e76b99b7ab84 # v0.0.1
+        with:
+          username: ${{ secrets.OSSRH_S01_TOKEN_USERNAME }}
+          password: ${{ secrets.OSSRH_S01_TOKEN_PASSWORD }}
+          staging-profile-name: ${{ secrets.OSSRH_S01_STAGING_PROFILE_NAME }}
+          create: true
+          upload: true
+          close: true
+          release: false
+          generate-checksums: true
+  promote-release:
+    name: Promote release
+    needs:
+      - build-and-stage-release
+      - get-version
+      - sync-to-maven-central
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up JFrog CLI
+        uses: jfrog/setup-jfrog-cli@d82fe26823e1f25529250895d5673f65b02af085 # v4.0.1
+        env:
+          JF_ENV_SPRING: ${{ secrets.JF_ARTIFACTORY_SPRING }}
+      - name: Promote build
+        run: jfrog rt build-promote ${{ format('gradle-enterprise-conventions-{0}', needs.get-version.outputs.version)}} ${{ github.run_number }} libs-release-local
+  create-github-release:
+    name: Create GitHub release
+    needs:
+      - promote-release
+      - get-version
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate changelog
+        uses: spring-io/github-changelog-generator@052892c62af51f8af87a9da6de55e70864b7df12
+        with:
+          milestone: ${{ needs.get-version.outputs.version }}
+          token: ${{ secrets.GH_ACTIONS_REPO_TOKEN }}
+      - name: Create GitHub release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_ACTIONS_REPO_TOKEN }}
+        run: |
+          gh release create ${{ github.ref_name }} --notes-file changelog.md
