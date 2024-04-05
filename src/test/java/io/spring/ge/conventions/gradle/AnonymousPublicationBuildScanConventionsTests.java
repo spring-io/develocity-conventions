@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2021 the original author or authors.
+ * Copyright 2020-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,19 +29,20 @@ class AnonymousPublicationBuildScanConventionsTests {
 
 	private final TestProcessRunner processRunner = new TestProcessRunner();
 
-	private final TestBuildScanExtension buildScan = new TestBuildScanExtension();
+	private final TestDevelocityConfiguration develocity = new TestDevelocityConfiguration();
+
+	private final TestBuildScanConfiguration buildScan = new TestBuildScanConfiguration();
 
 	@Test
 	void buildScansAreConfiguredToUseDefaultPublicationBehaviour() {
-		new AnonymousPublicationBuildScanConventions(this.processRunner).execute(this.buildScan);
-		assertThat(this.buildScan.publishAlways).isFalse();
-		assertThat(this.buildScan.publishIfAuthenticated).isFalse();
+		new AnonymousPublicationBuildScanConventions(this.develocity, this.processRunner).execute(this.buildScan);
+		assertThat(this.buildScan.publishing.predicate).isNull();
 	}
 
 	@Test
 	void buildScansAreConfiguredToPublishToDefaultServer() {
-		new AnonymousPublicationBuildScanConventions(this.processRunner).execute(this.buildScan);
-		assertThat(this.buildScan.server).isNull();
+		new AnonymousPublicationBuildScanConventions(this.develocity, this.processRunner).execute(this.buildScan);
+		assertThat(this.develocity.getServer().getOrNull()).isNull();
 	}
 
 }

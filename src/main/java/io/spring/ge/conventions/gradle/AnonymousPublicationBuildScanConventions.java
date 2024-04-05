@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2021 the original author or authors.
+ * Copyright 2020-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,8 @@ package io.spring.ge.conventions.gradle;
 
 import java.util.Map;
 
-import com.gradle.scan.plugin.BuildScanExtension;
+import com.gradle.develocity.agent.gradle.DevelocityConfiguration;
+import com.gradle.develocity.agent.gradle.scan.BuildScanConfiguration;
 
 /**
  * Conventions for build scans that are published anonymously to
@@ -28,16 +29,17 @@ import com.gradle.scan.plugin.BuildScanExtension;
  */
 public class AnonymousPublicationBuildScanConventions extends BuildScanConventions {
 
-	public AnonymousPublicationBuildScanConventions(ProcessRunner processRunner, Map<String, String> env) {
-		super(processRunner, env);
+	public AnonymousPublicationBuildScanConventions(DevelocityConfiguration develocity, ProcessRunner processRunner,
+			Map<String, String> env) {
+		super(develocity, processRunner, env);
 	}
 
-	public AnonymousPublicationBuildScanConventions(ProcessRunner processRunner) {
-		super(processRunner);
+	public AnonymousPublicationBuildScanConventions(DevelocityConfiguration develocity, ProcessRunner processRunner) {
+		super(develocity, processRunner);
 	}
 
 	@Override
-	protected void configurePublishing(BuildScanExtension buildScan) {
+	protected void configurePublishing(BuildScanConfiguration buildScan) {
 		// Use Gradle's defaults
 	}
 

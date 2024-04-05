@@ -43,7 +43,7 @@ The username and password environment variables should be set using the `gradle_
 
 ## Build scan conventions
 
-When applied alongside the [Gradle Enterprise Plugin](https://plugins.gradle.org/plugin/com.gradle.enterprise), the plugin will configure publishing of build scans to [ge.spring.io](https://ge.spring.io) when authenticated.
+When applied alongside the [Develocity Plugin](https://plugins.gradle.org/plugin/com.gradle.develocity), the plugin will configure publishing of build scans to [ge.spring.io](https://ge.spring.io) when authenticated.
 The build scans will be customized to:
 
 - Add tags:
@@ -59,7 +59,7 @@ The build scans will be customized to:
  - Add links:
     - `CI build` when building on Bamboo, GitHub Actions, or Jenkins, linking to the build on the CI server.
     - `Git commit build scans`, linking to scans for other builds of the same git commit.
- - Enable capturing of task (Gradle) or goal (Maven) input files
+ - Enable capturing of file fingerprints
  - Upload build scans in the foreground when running on CI
 
 ### Build scan publishing credentials
@@ -125,12 +125,12 @@ pluginManagement {
 
 In the example above, `gradlePluginPortal()` is declared to allow other plugins to continue to be resolved from the portal.
 
-Now apply the plugin in `settings.gradle`, alongside the `com.gradle.enterprise` plugin:
+Now apply the plugin in `settings.gradle`, alongside the `com.gradle.develocity` plugin:
 
 ```groovy
 plugins {
 	// …
-	id "com.gradle.enterprise" version "<<version>>"
+	id "com.gradle.develocity" version "<<version>>"
 	id "io.spring.ge.conventions" version "<<version>>"
 	// …
 }

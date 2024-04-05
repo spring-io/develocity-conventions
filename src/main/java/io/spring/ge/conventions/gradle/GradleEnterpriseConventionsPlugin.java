@@ -20,9 +20,9 @@ import java.io.File;
 
 import javax.inject.Inject;
 
-import com.gradle.enterprise.gradleplugin.GradleEnterpriseExtension;
-import com.gradle.enterprise.gradleplugin.GradleEnterprisePlugin;
-import com.gradle.scan.plugin.BuildScanExtension;
+import com.gradle.develocity.agent.gradle.DevelocityConfiguration;
+import com.gradle.develocity.agent.gradle.DevelocityPlugin;
+import com.gradle.develocity.agent.gradle.scan.BuildScanConfiguration;
 import org.gradle.StartParameter;
 import org.gradle.api.Plugin;
 import org.gradle.api.initialization.Settings;
@@ -45,9 +45,9 @@ public class GradleEnterpriseConventionsPlugin implements Plugin<Settings> {
 
 	@Override
 	public void apply(Settings settings) {
-		settings.getPlugins().withType(GradleEnterprisePlugin.class, (plugin) -> {
-			GradleEnterpriseExtension extension = settings.getExtensions().getByType(GradleEnterpriseExtension.class);
-			configureBuildScanConventions(extension.getBuildScan(), settings.getStartParameter(),
+		settings.getPlugins().withType(DevelocityPlugin.class, (plugin) -> {
+			DevelocityConfiguration extension = settings.getExtensions().getByType(DevelocityConfiguration.class);
+			configureBuildScanConventions(extension, extension.getBuildScan(), settings.getStartParameter(),
 					settings.getRootDir());
 		});
 		if (settings.getStartParameter().isBuildCacheEnabled()) {
@@ -56,15 +56,15 @@ public class GradleEnterpriseConventionsPlugin implements Plugin<Settings> {
 		}
 	}
 
-	private void configureBuildScanConventions(BuildScanExtension buildScan, StartParameter startParameter,
-			File rootDir) {
+	private void configureBuildScanConventions(DevelocityConfiguration develocity, BuildScanConfiguration buildScan,
+			StartParameter startParameter, File rootDir) {
 		if (startParameter.isNoBuildScan() || containsPropertiesTask(startParameter)) {
 			return;
 		}
 		ProcessOperationsProcessRunner processRunner = new ProcessOperationsProcessRunner(
 				new WorkingDirectoryProcessOperations(this.processOperations, rootDir));
 		if (startParameter.isBuildScan()) {
-			new AnonymousPublicationBuildScanConventions(processRunner) {
+			new AnonymousPublicationBuildScanConventions(develocity, processRunner) {
 
 				@Override
 				protected String getJdkVersion() {
@@ -75,7 +75,7 @@ public class GradleEnterpriseConventionsPlugin implements Plugin<Settings> {
 			}.execute(buildScan);
 		}
 		else {
-			new BuildScanConventions(processRunner) {
+			new BuildScanConventions(develocity, processRunner) {
 
 				@Override
 				protected String getJdkVersion() {

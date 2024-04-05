@@ -23,30 +23,34 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-import com.gradle.scan.plugin.BuildScanExtension;
+import com.gradle.develocity.agent.gradle.DevelocityConfiguration;
+import com.gradle.develocity.agent.gradle.scan.BuildScanConfiguration;
 import org.gradle.api.Action;
 
 /**
- * {@link Action} that configures the {@link BuildScanExtension build scan} with Spring
- * conventions.
+ * {@link Action} that configures the {@link BuildScanConfiguration build scan} with
+ * Spring conventions.
  *
  * @author Andy Wilkinson
  */
-class BuildScanConventions implements Action<BuildScanExtension> {
+class BuildScanConventions implements Action<BuildScanConfiguration> {
 
 	private static final String BAMBOO_RESULTS_ENV_VAR = "bamboo_resultsUrl";
 
 	private static final String CIRCLECI_BUILD_URL_ENV_VAR = "CIRCLE_BUILD_URL";
 
-	private final Map<String, String> env;
+	private final DevelocityConfiguration develocity;
 
 	private final ProcessRunner processRunner;
 
-	BuildScanConventions(ProcessRunner processRunner) {
-		this(processRunner, System.getenv());
+	private final Map<String, String> env;
+
+	BuildScanConventions(DevelocityConfiguration develocity, ProcessRunner processRunner) {
+		this(develocity, processRunner, System.getenv());
 	}
 
-	BuildScanConventions(ProcessRunner processRunner, Map<String, String> env) {
+	BuildScanConventions(DevelocityConfiguration develocity, ProcessRunner processRunner, Map<String, String> env) {
+		this.develocity = develocity;
 		this.processRunner = processRunner;
 		this.env = env;
 	}
@@ -56,21 +60,15 @@ class BuildScanConventions implements Action<BuildScanExtension> {
 	 * @param buildScan build scan to be configured
 	 */
 	@Override
-	@SuppressWarnings("deprecation")
-	public void execute(BuildScanExtension buildScan) {
+	public void execute(BuildScanConfiguration buildScan) {
 		buildScan.obfuscation((obfuscation) -> obfuscation
 			.ipAddresses((addresses) -> addresses.stream().map((address) -> "0.0.0.0").collect(Collectors.toList())));
 		configurePublishing(buildScan);
 		tagBuildScan(buildScan);
 		buildScan.background(this::addGitMetadata);
 		addCiMetadata(buildScan);
-		buildScan.setUploadInBackground(!isCi());
-		try {
-			buildScan.capture((settings) -> settings.setTaskInputFiles(true));
-		}
-		catch (NoSuchMethodError ex) {
-			buildScan.setCaptureTaskInputFiles(true);
-		}
+		buildScan.getUploadInBackground().set(!isCi());
+		buildScan.capture((settings) -> settings.getFileFingerprints().set(true));
 	}
 
 	/**
@@ -79,24 +77,18 @@ class BuildScanConventions implements Action<BuildScanExtension> {
 	 * {@code https://ge.spring.io}.
 	 * @param buildScan build scan to configure
 	 */
-	protected void configurePublishing(BuildScanExtension buildScan) {
-		buildScan.publishAlways();
-		try {
-			buildScan.getClass().getMethod("publishIfAuthenticated").invoke(buildScan);
-		}
-		catch (Exception ex) {
-			throw new RuntimeException("Failed to invoke publishIfAuthenticated()", ex);
-		}
-		buildScan.setServer("https://ge.spring.io");
+	protected void configurePublishing(BuildScanConfiguration buildScan) {
+		buildScan.publishing((publishing) -> publishing.onlyIf((context) -> context.isAuthenticated()));
+		this.develocity.getServer().set("https://ge.spring.io");
 	}
 
-	private void tagBuildScan(BuildScanExtension buildScan) {
+	private void tagBuildScan(BuildScanConfiguration buildScan) {
 		tagCiOrLocal(buildScan);
 		tagJdk(buildScan);
 		tagOperatingSystem(buildScan);
 	}
 
-	private void tagCiOrLocal(BuildScanExtension buildScan) {
+	private void tagCiOrLocal(BuildScanConfiguration buildScan) {
 		buildScan.tag(isCi() ? "CI" : "Local");
 	}
 
@@ -127,7 +119,7 @@ class BuildScanConventions implements Action<BuildScanExtension> {
 		return this.env.containsKey("GITHUB_ACTIONS");
 	}
 
-	private void tagJdk(BuildScanExtension buildScan) {
+	private void tagJdk(BuildScanConfiguration buildScan) {
 		buildScan.tag("JDK-" + getJdkVersion());
 	}
 
@@ -135,15 +127,16 @@ class BuildScanConventions implements Action<BuildScanExtension> {
 		return System.getProperty("java.specification.version");
 	}
 
-	private void tagOperatingSystem(BuildScanExtension buildScan) {
+	private void tagOperatingSystem(BuildScanConfiguration buildScan) {
 		buildScan.tag(System.getProperty("os.name"));
 	}
 
-	private void addGitMetadata(BuildScanExtension buildScan) {
+	private void addGitMetadata(BuildScanConfiguration buildScan) {
 		run("git", "rev-parse", "--short=8", "--verify", "HEAD").standardOut((gitCommitId) -> {
 			String commitIdLabel = "Git commit";
 			buildScan.value(commitIdLabel, gitCommitId);
-			String server = buildScan.getServer();
+
+			String server = this.develocity.getServer().getOrNull();
 			if (server != null) {
 				buildScan.link("Git commit build scans", server + createSearchUrl(commitIdLabel, gitCommitId));
 			}
@@ -158,7 +151,7 @@ class BuildScanConventions implements Action<BuildScanExtension> {
 		});
 	}
 
-	private void addCiMetadata(BuildScanExtension buildScan) {
+	private void addCiMetadata(BuildScanConfiguration buildScan) {
 		if (isBamboo()) {
 			buildScan.link("CI build", this.env.get(BAMBOO_RESULTS_ENV_VAR));
 		}

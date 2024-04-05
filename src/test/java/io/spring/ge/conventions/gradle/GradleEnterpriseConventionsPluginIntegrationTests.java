@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.function.Consumer;
 
-import com.gradle.enterprise.gradleplugin.GradleEnterprisePlugin;
+import com.gradle.develocity.agent.gradle.DevelocityPlugin;
 import org.gradle.testkit.runner.BuildResult;
 import org.gradle.testkit.runner.GradleRunner;
 import org.junit.jupiter.api.Test;
@@ -102,7 +102,7 @@ class GradleEnterpriseConventionsPluginIntegrationTests {
 		write(new File(projectDir, "gradle.properties"), (writer) -> writer.println("org.gradle.caching=true"));
 		write(new File(projectDir, "settings.gradle"), (writer) -> {
 			writer.println("plugins {");
-			writer.println("    id 'com.gradle.enterprise'");
+			writer.println("    id 'com.gradle.develocity'");
 			writer.println("    id 'io.spring.ge.conventions' version '" + version() + "'");
 			writer.println("}");
 			writer.println("gradle.afterProject { project -> project.ext['settings'] = settings }");
@@ -127,7 +127,7 @@ class GradleEnterpriseConventionsPluginIntegrationTests {
 		write(new File(projectDir, "gradle.properties"), (writer) -> writer.println("org.gradle.caching=true"));
 		write(new File(projectDir, "settings.gradle"), (writer) -> {
 			writer.println("plugins {");
-			writer.println("    id 'com.gradle.enterprise'");
+			writer.println("    id 'com.gradle.develocity'");
 			writer.println("    id 'io.spring.ge.conventions' version '" + version() + "'");
 			writer.println("}");
 			writer.println("include 'sub'");
@@ -173,7 +173,7 @@ class GradleEnterpriseConventionsPluginIntegrationTests {
 	private BuildResult build(File projectDir, String gradleVersion, String... arguments) {
 		List<File> classpath = Arrays.asList(new File("bin/main"), new File("build/classes/java/main"),
 				new File("build/resources/main"),
-				new File(GradleEnterprisePlugin.class.getProtectionDomain().getCodeSource().getLocation().getFile()));
+				new File(DevelocityPlugin.class.getProtectionDomain().getCodeSource().getLocation().getFile()));
 		return GradleRunner.create()
 			.withGradleVersion(gradleVersion)
 			.withProjectDir(projectDir)
