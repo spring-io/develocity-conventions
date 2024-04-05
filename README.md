@@ -43,7 +43,7 @@ The username and password environment variables should be set using the `gradle_
 
 ## Build scan conventions
 
-When applied as a settings plugin (Gradle 6) or a project plugin (Gradle 5) alongside the [Gradle Enterprise Plugin](https://plugins.gradle.org/plugin/com.gradle.enterprise), the plugin will configure publishing of build scans to [ge.spring.io](https://ge.spring.io) when authenticated.
+When applied alongside the [Gradle Enterprise Plugin](https://plugins.gradle.org/plugin/com.gradle.enterprise), the plugin will configure publishing of build scans to [ge.spring.io](https://ge.spring.io) when authenticated.
 The build scans will be customized to:
 
 - Add tags:
