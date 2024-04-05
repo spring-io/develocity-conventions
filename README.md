@@ -108,8 +108,8 @@ Jenkins is detected by looking for an environment variable named `JENKINS_URL`.
 
 ## Using the conventions
 
-The conventions are published to https://repo.spring.io.
-Depending on the version you wish to use, they will be availble from the `snapshot` or `release` repository.
+Releases of the conventions are published to Maven Central.
+Snapshots are published to https://repo.spring.io/snapshot.
 
 The first step in using the conventions is to make the necessary repository available for plugin resolution.
 This is done by configuring a plugin management repository in `settings.gradle`, as shown in the following example:
@@ -118,7 +118,7 @@ This is done by configuring a plugin management repository in `settings.gradle`,
 pluginManagement {
 	repositories {
 		gradlePluginPortal()
-		maven { url 'https://repo.spring.io/release' }
+		mavenCentral()
 	}
 }
 ```
