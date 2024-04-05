@@ -124,24 +124,8 @@ pluginManagement {
 ```
 
 In the example above, `gradlePluginPortal()` is declared to allow other plugins to continue to be resolved from the portal.
-The second step in applying the plugin depends on the version of Gradle that you are using.
 
-#### Gradle 5.x
-
-The plugin should be applied in `build.gradle` of the root project, alongside the `com.gradle.build-scan` plugin:
-
-```groovy
-plugins {
-	// …
-	id "com.gradle.build-scan" version "<<version>>"
-	id "io.spring.ge.conventions" version "<<version>>"
-	// …
-}
-```
-
-#### Gradle 6.x and later
-
-The plugin should be applied in `settings.gradle`, alongside the `com.gradle.enterprise` plugin:
+Now apply the plugin in `settings.gradle`, alongside the `com.gradle.enterprise` plugin:
 
 ```groovy
 plugins {

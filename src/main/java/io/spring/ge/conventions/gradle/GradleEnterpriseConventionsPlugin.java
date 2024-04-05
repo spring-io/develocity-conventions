@@ -25,7 +25,6 @@ import com.gradle.enterprise.gradleplugin.GradleEnterprisePlugin;
 import com.gradle.scan.plugin.BuildScanExtension;
 import org.gradle.StartParameter;
 import org.gradle.api.Plugin;
-import org.gradle.api.Project;
 import org.gradle.api.initialization.Settings;
 import org.gradle.api.internal.ProcessOperations;
 
@@ -35,7 +34,7 @@ import org.gradle.api.internal.ProcessOperations;
  *
  * @author Andy Wilkinson
  */
-public class GradleEnterpriseConventionsPlugin implements Plugin<Object> {
+public class GradleEnterpriseConventionsPlugin implements Plugin<Settings> {
 
 	private final ProcessOperations processOperations;
 
@@ -45,16 +44,7 @@ public class GradleEnterpriseConventionsPlugin implements Plugin<Object> {
 	}
 
 	@Override
-	public void apply(Object target) {
-		if (target instanceof Settings) {
-			apply((Settings) target);
-		}
-		else if (target instanceof Project) {
-			apply((Project) target);
-		}
-	}
-
-	private void apply(Settings settings) {
+	public void apply(Settings settings) {
 		settings.getPlugins().withType(GradleEnterprisePlugin.class, (plugin) -> {
 			GradleEnterpriseExtension extension = settings.getExtensions().getByType(GradleEnterpriseExtension.class);
 			configureBuildScanConventions(extension.getBuildScan(), settings.getStartParameter(),
@@ -64,14 +54,6 @@ public class GradleEnterpriseConventionsPlugin implements Plugin<Object> {
 			settings
 				.buildCache((buildCacheConfiguration) -> new BuildCacheConventions().execute(buildCacheConfiguration));
 		}
-	}
-
-	private void apply(Project project) {
-		project.getPlugins()
-			.withId("com.gradle.build-scan",
-					(plugin) -> configureBuildScanConventions(
-							project.getExtensions().getByType(BuildScanExtension.class),
-							project.getGradle().getStartParameter(), project.getRootDir()));
 	}
 
 	private void configureBuildScanConventions(BuildScanExtension buildScan, StartParameter startParameter,
