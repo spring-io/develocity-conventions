@@ -69,7 +69,7 @@ class BuildCacheConventionsTests {
 	@Test
 	void remoteCacheServerCanBeConfigured() {
 		Map<String, String> env = new HashMap<>();
-		env.put("GRADLE_ENTERPRISE_CACHE_SERVER", "https://ge.example.com");
+		env.put("DEVELOCITY_CACHE_SERVER", "https://ge.example.com");
 		new BuildCacheConventions(DevelocityBuildCache.class, env).execute(this.buildCache);
 		assertThat(this.buildCache.remote.isEnabled()).isTrue();
 		assertThat(this.buildCache.remote.getServer()).isEqualTo("https://ge.example.com");
@@ -80,7 +80,7 @@ class BuildCacheConventionsTests {
 	void remoteCacheServerHasPrecedenceOverRemoteCacheUrl() {
 		Map<String, String> env = new HashMap<>();
 		env.put("GRADLE_ENTERPRISE_CACHE_URL", "https://ge-cache.example.com/cache/");
-		env.put("GRADLE_ENTERPRISE_CACHE_SERVER", "https://ge.example.com");
+		env.put("DEVELOCITY_CACHE_SERVER", "https://ge.example.com");
 		new BuildCacheConventions(DevelocityBuildCache.class, env).execute(this.buildCache);
 		assertThat(this.buildCache.remote.isEnabled()).isTrue();
 		assertThat(this.buildCache.remote.getServer()).isEqualTo("https://ge.example.com");
@@ -90,13 +90,30 @@ class BuildCacheConventionsTests {
 	@Test
 	void whenAccessTokenIsProvidedInALocalEnvironmentThenPushingToTheRemoteCacheIsNotEnabled() {
 		new BuildCacheConventions(DevelocityBuildCache.class,
-				Collections.singletonMap("GRADLE_ENTERPRISE_ACCESS_KEY", "ge.example.com=a1b2c3d4"))
+				Collections.singletonMap("DEVELOCITY_ACCESS_KEY", "ge.example.com=a1b2c3d4"))
 			.execute(this.buildCache);
 		assertThat(this.buildCache.remote.isPush()).isFalse();
 	}
 
 	@Test
 	void whenAccessTokenIsProvidedInACiEnvironmentThenPushingToTheRemoteCacheIsNotEnabled() {
+		Map<String, String> env = new HashMap<>();
+		env.put("DEVELOCITY_ACCESS_KEY", "ge.example.com=a1b2c3d4");
+		env.put("CI", "true");
+		new BuildCacheConventions(DevelocityBuildCache.class, env).execute(this.buildCache);
+		assertThat(this.buildCache.remote.isPush()).isTrue();
+	}
+
+	@Test
+	void whenLegacyAccessTokenIsProvidedInALocalEnvironmentThenPushingToTheRemoteCacheIsNotEnabled() {
+		new BuildCacheConventions(DevelocityBuildCache.class,
+				Collections.singletonMap("GRADLE_ENTERPRISE_ACCESS_KEY", "ge.example.com=a1b2c3d4"))
+			.execute(this.buildCache);
+		assertThat(this.buildCache.remote.isPush()).isFalse();
+	}
+
+	@Test
+	void whenLegacyAccessTokenIsProvidedInACiEnvironmentThenPushingToTheRemoteCacheIsNotEnabled() {
 		Map<String, String> env = new HashMap<>();
 		env.put("GRADLE_ENTERPRISE_ACCESS_KEY", "ge.example.com=a1b2c3d4");
 		env.put("CI", "true");

@@ -16,7 +16,7 @@ When applied, the conventions will configure the build cache to:
 #### URL
 
 By default, https://ge.spring.io will be used as the remote cache server.
-The server can be configured using the `GRADLE_ENTERPRISE_CACHE_SERVER` environment variable.
+The server can be configured using the `DEVELOCITY_CACHE_SERVER` environment variable.
 For backwards compatibility, `GRADLE_ENTERPRISE_CACHE_URL` is also supported for a limited time.
 `/cache/` is removed from the end of the URL and the remainder is used to configure the remote cache server.
 
@@ -57,7 +57,8 @@ When using Gradle, build scans can be published anonymously to scans.gradle.com 
 
 Publishing build scans and pushing to the remote cache requires authentication via an access key.
 Additionally, pushing to the remote cache also requires that a CI environment be detected.
-When running on CI, the access key should be made available via the `GRADLE_ENTERPRISE_ACCESS_KEY` environment variable.
+When running on CI, the access key should be made available via the `DEVELOCITY_ACCESS_KEY` environment variable.
+`GRADLE_ENTERPRISE_ACCESS_KEY` can also be used although it will result in a deprecation warning from Gradle.
 
 #### Bamboo
 
@@ -77,7 +78,7 @@ The environment variable should be set using the `gradle_enterprise_secret_acces
 
 #### Local
 
-An access key can be provisioned by running `./gradlew provisionGradleEnterpriseAccessKey` once the project has been configured to use this plugin.
+An access key can be provisioned by running `./gradlew provisionDevelocityAccessKey` once the project has been configured to use this plugin.
 
 ## Detecting CI
 

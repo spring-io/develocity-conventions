@@ -49,7 +49,7 @@ public class BuildCacheConventions {
 		buildCache.local((local) -> local.setEnabled(true));
 		buildCache.remote(this.buildCacheType, (remote) -> {
 			remote.setEnabled(true);
-			String cacheServer = this.env.get("GRADLE_ENTERPRISE_CACHE_SERVER");
+			String cacheServer = this.env.get("DEVELOCITY_CACHE_SERVER");
 			if (cacheServer == null) {
 				cacheServer = serverOfCacheUrl(this.env.get("GRADLE_ENTERPRISE_CACHE_URL"));
 				if (cacheServer == null) {
@@ -57,7 +57,10 @@ public class BuildCacheConventions {
 				}
 			}
 			remote.setServer(cacheServer);
-			String accessKey = this.env.get("GRADLE_ENTERPRISE_ACCESS_KEY");
+			String accessKey = this.env.get("DEVELOCITY_ACCESS_KEY");
+			if (accessKey == null) {
+				accessKey = this.env.get("GRADLE_ENTERPRISE_ACCESS_KEY");
+			}
 			if (hasText(accessKey) && ContinuousIntegration.detect(this.env) != null) {
 				remote.setPush(true);
 			}
