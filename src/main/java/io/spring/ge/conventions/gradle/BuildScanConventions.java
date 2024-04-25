@@ -35,10 +35,6 @@ import org.gradle.api.Action;
  */
 class BuildScanConventions implements Action<BuildScanConfiguration> {
 
-	private static final String BAMBOO_RESULTS_ENV_VAR = "bamboo_resultsUrl";
-
-	private static final String CIRCLECI_BUILD_URL_ENV_VAR = "CIRCLE_BUILD_URL";
-
 	private final DevelocityConfiguration develocity;
 
 	private final ProcessRunner processRunner;
@@ -64,10 +60,11 @@ class BuildScanConventions implements Action<BuildScanConfiguration> {
 		buildScan.obfuscation((obfuscation) -> obfuscation
 			.ipAddresses((addresses) -> addresses.stream().map((address) -> "0.0.0.0").collect(Collectors.toList())));
 		configurePublishing(buildScan);
-		tagBuildScan(buildScan);
+		ContinuousIntegration ci = ContinuousIntegration.detect(this.env);
+		tagBuildScan(buildScan, ci);
 		buildScan.background(this::addGitMetadata);
-		addCiMetadata(buildScan);
-		buildScan.getUploadInBackground().set(!isCi());
+		addCiMetadata(buildScan, ci);
+		buildScan.getUploadInBackground().set(ci == null);
 		buildScan.capture((settings) -> settings.getFileFingerprints().set(true));
 	}
 
@@ -82,41 +79,14 @@ class BuildScanConventions implements Action<BuildScanConfiguration> {
 		this.develocity.getServer().set("https://ge.spring.io");
 	}
 
-	private void tagBuildScan(BuildScanConfiguration buildScan) {
-		tagCiOrLocal(buildScan);
+	private void tagBuildScan(BuildScanConfiguration buildScan, ContinuousIntegration ci) {
+		tagCiOrLocal(buildScan, ci);
 		tagJdk(buildScan);
 		tagOperatingSystem(buildScan);
 	}
 
-	private void tagCiOrLocal(BuildScanConfiguration buildScan) {
-		buildScan.tag(isCi() ? "CI" : "Local");
-	}
-
-	private boolean isCi() {
-		if (isBamboo() || isCircleCi() || isConcourse() || isJenkins() || isGitHubActions()) {
-			return true;
-		}
-		return false;
-	}
-
-	private boolean isBamboo() {
-		return this.env.containsKey(BAMBOO_RESULTS_ENV_VAR);
-	}
-
-	private boolean isCircleCi() {
-		return this.env.containsKey(CIRCLECI_BUILD_URL_ENV_VAR);
-	}
-
-	private boolean isConcourse() {
-		return this.env.containsKey("CI");
-	}
-
-	private boolean isJenkins() {
-		return this.env.containsKey("JENKINS_URL");
-	}
-
-	private boolean isGitHubActions() {
-		return this.env.containsKey("GITHUB_ACTIONS");
+	private void tagCiOrLocal(BuildScanConfiguration buildScan, ContinuousIntegration ci) {
+		buildScan.tag((ci != null) ? "CI" : "Local");
 	}
 
 	private void tagJdk(BuildScanConfiguration buildScan) {
@@ -151,25 +121,15 @@ class BuildScanConventions implements Action<BuildScanConfiguration> {
 		});
 	}
 
-	private void addCiMetadata(BuildScanConfiguration buildScan) {
-		if (isBamboo()) {
-			buildScan.link("CI build", this.env.get(BAMBOO_RESULTS_ENV_VAR));
+	private void addCiMetadata(BuildScanConfiguration buildScan, ContinuousIntegration ci) {
+		if (ci == null) {
+			return;
 		}
-		else if (isJenkins()) {
-			String buildUrl = this.env.get("BUILD_URL");
-			if (hasText(buildUrl)) {
-				buildScan.link("CI build", buildUrl);
-			}
+		String buildUrl = ci.buildUrlFrom(this.env);
+		if (hasText(buildUrl)) {
+			buildScan.link("CI build", buildUrl);
 		}
-		else if (isCircleCi()) {
-			buildScan.link("CI build", this.env.get(CIRCLECI_BUILD_URL_ENV_VAR));
-		}
-		else if (isGitHubActions()) {
-			String server = this.env.get("GITHUB_SERVER_URL");
-			String repository = this.env.get("GITHUB_REPOSITORY");
-			String runId = this.env.get("GITHUB_RUN_ID");
-			buildScan.link("CI build", server + "/" + repository + "/actions/runs/" + runId);
-		}
+		buildScan.value("CI provider", ci.toString());
 	}
 
 	private RunResult getBranch() {

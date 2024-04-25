@@ -92,11 +92,43 @@ class BuildScanConventionsTests {
 	}
 
 	@Test
+	void whenBambooResultEnvVarIsPresentThenBuildScanHasBambooAsTheCiProviderValue() {
+		new BuildScanConventions(this.develocity, this.processRunner,
+				Collections.singletonMap("bamboo_resultsUrl", "https://bamboo.example.com"))
+			.execute(this.buildScan);
+		assertThat(this.buildScan.values).containsEntry("CI provider", "Bamboo");
+	}
+
+	@Test
+	void whenCircleBuildUrlEnvVarIsPresentThenBuildScanIsTaggedWithCiNotLocal() {
+		new BuildScanConventions(this.develocity, this.processRunner,
+				Collections.singletonMap("CIRCLE_BUILD_URL", "https://circleci.example.com/gh/org/project/123"))
+			.execute(this.buildScan);
+		assertThat(this.buildScan.tags).contains("CI").doesNotContain("Local");
+	}
+
+	@Test
 	void whenCircleBuildUrlEnvVarIsPresentThenBuildScanHasACiBuildLinkToIt() {
 		new BuildScanConventions(this.develocity, this.processRunner,
 				Collections.singletonMap("CIRCLE_BUILD_URL", "https://circleci.example.com/gh/org/project/123"))
 			.execute(this.buildScan);
 		assertThat(this.buildScan.links).containsEntry("CI build", "https://circleci.example.com/gh/org/project/123");
+	}
+
+	@Test
+	void whenCircleBuildUrlEnvVarIsPresentThenBuildScanHasCircleCiAsTheCiProviderValue() {
+		new BuildScanConventions(this.develocity, this.processRunner,
+				Collections.singletonMap("CIRCLE_BUILD_URL", "https://circleci.example.com/gh/org/project/123"))
+			.execute(this.buildScan);
+		assertThat(this.buildScan.values).containsEntry("CI provider", "CircleCI");
+	}
+
+	@Test
+	void whenJenkinsUrlEnvVarIsPresentThenBuildScanIsTaggedWithCiNotLocal() {
+		new BuildScanConventions(this.develocity, this.processRunner,
+				Collections.singletonMap("JENKINS_URL", "https://jenkins.example.com"))
+			.execute(this.buildScan);
+		assertThat(this.buildScan.tags).contains("CI").doesNotContain("Local");
 	}
 
 	@Test
@@ -109,6 +141,14 @@ class BuildScanConventionsTests {
 	}
 
 	@Test
+	void whenJenkinsUrlEnvVarIsPresentThenBuildScanHasJenkinsAsTheCiProviderValue() {
+		new BuildScanConventions(this.develocity, this.processRunner,
+				Collections.singletonMap("JENKINS_URL", "https://jenkins.example.com"))
+			.execute(this.buildScan);
+		assertThat(this.buildScan.values).containsEntry("CI provider", "Jenkins");
+	}
+
+	@Test
 	void whenCiEnvVarIsPresentThenBuildScanIsTaggedWithCiNotLocal() {
 		new BuildScanConventions(this.develocity, this.processRunner, Collections.singletonMap("CI", null))
 			.execute(this.buildScan);
@@ -116,11 +156,10 @@ class BuildScanConventionsTests {
 	}
 
 	@Test
-	void whenJenkinsUrlEnvVarIsPresentThenBuildScanIsTaggedWithCiNotLocal() {
-		new BuildScanConventions(this.develocity, this.processRunner,
-				Collections.singletonMap("JENKINS_URL", "https://jenkins.example.com"))
+	void whenCiEnvVarIsPresentThenBuildScanHasConcourseAsTheCiProviderValue() {
+		new BuildScanConventions(this.develocity, this.processRunner, Collections.singletonMap("CI", null))
 			.execute(this.buildScan);
-		assertThat(this.buildScan.tags).contains("CI").doesNotContain("Local");
+		assertThat(this.buildScan.values).containsEntry("CI provider", "Concourse");
 	}
 
 	@Test
@@ -144,9 +183,29 @@ class BuildScanConventionsTests {
 	}
 
 	@Test
+	void whenGitHubActionsEnvVarIsPresentThenBuildScanHasGitHubActionsAsTheCiProviderValue() {
+		new BuildScanConventions(this.develocity, this.processRunner,
+				Collections.singletonMap("GITHUB_ACTIONS", "true"))
+			.execute(this.buildScan);
+		assertThat(this.buildScan.values).containsEntry("CI provider", "GitHub Actions");
+	}
+
+	@Test
 	void whenNoCiIndicatorsArePresentThenBuildScanIsTaggedWithLocalNotCi() {
 		new BuildScanConventions(this.develocity, this.processRunner, Collections.emptyMap()).execute(this.buildScan);
 		assertThat(this.buildScan.tags).contains("Local").doesNotContain("CI");
+	}
+
+	@Test
+	void whenNoCiIndicatorsArePresentThenBuildScanHasNoCiBuildLink() {
+		new BuildScanConventions(this.develocity, this.processRunner, Collections.emptyMap()).execute(this.buildScan);
+		assertThat(this.buildScan.links).doesNotContainKey("CI build");
+	}
+
+	@Test
+	void whenNoCiIndicatorsArePresentThenBuildScanHasNoCiProviderValue() {
+		new BuildScanConventions(this.develocity, this.processRunner, Collections.emptyMap()).execute(this.buildScan);
+		assertThat(this.buildScan.values).doesNotContainKey("CI provider");
 	}
 
 	@Test
