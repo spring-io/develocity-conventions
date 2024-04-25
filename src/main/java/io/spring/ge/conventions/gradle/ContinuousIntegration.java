@@ -30,16 +30,16 @@ enum ContinuousIntegration {
 
 	CIRCLE_CI("CircleCI", "CIRCLE_BUILD_URL"),
 
-	CONCOURSE("Concourse", "CI", (env) -> null),
-
-	JENKINS("Jenkins", "JENKINS_URL", (env) -> env.get("BUILD_URL")),
-
 	GITHUB_ACTIONS("GitHub Actions", "GITHUB_ACTIONS", (env) -> {
 		String server = env.get("GITHUB_SERVER_URL");
 		String repository = env.get("GITHUB_REPOSITORY");
 		String runId = env.get("GITHUB_RUN_ID");
 		return server + "/" + repository + "/actions/runs/" + runId;
-	});
+	}),
+
+	JENKINS("Jenkins", "JENKINS_URL", (env) -> env.get("BUILD_URL")),
+
+	CONCOURSE("Concourse", "CI", (env) -> null);
 
 	private final String name;
 
