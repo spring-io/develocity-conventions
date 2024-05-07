@@ -51,7 +51,7 @@ class BuildCacheConventionsTests {
 	void remoteCacheIsEnabled() {
 		new BuildCacheConventions(DevelocityBuildCache.class).execute(this.buildCache);
 		assertThat(this.buildCache.remote.isEnabled()).isTrue();
-		assertThat(this.buildCache.remote.getServer()).isNull();
+		assertThat(this.buildCache.remote.getServer()).isEqualTo("https://ge.spring.io");
 		assertThat(this.buildCache.remote.isPush()).isFalse();
 	}
 
