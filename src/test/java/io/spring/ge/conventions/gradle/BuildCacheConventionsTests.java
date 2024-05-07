@@ -96,7 +96,7 @@ class BuildCacheConventionsTests {
 	}
 
 	@Test
-	void whenAccessTokenIsProvidedInACiEnvironmentThenPushingToTheRemoteCacheIsNotEnabled() {
+	void whenAccessTokenIsProvidedInACiEnvironmentThenPushingToTheRemoteCacheIsEnabled() {
 		Map<String, String> env = new HashMap<>();
 		env.put("DEVELOCITY_ACCESS_KEY", "ge.example.com=a1b2c3d4");
 		env.put("CI", "true");
@@ -113,7 +113,7 @@ class BuildCacheConventionsTests {
 	}
 
 	@Test
-	void whenLegacyAccessTokenIsProvidedInACiEnvironmentThenPushingToTheRemoteCacheIsNotEnabled() {
+	void whenLegacyAccessTokenIsProvidedInACiEnvironmentThenPushingToTheRemoteCacheIsEnabled() {
 		Map<String, String> env = new HashMap<>();
 		env.put("GRADLE_ENTERPRISE_ACCESS_KEY", "ge.example.com=a1b2c3d4");
 		env.put("CI", "true");
