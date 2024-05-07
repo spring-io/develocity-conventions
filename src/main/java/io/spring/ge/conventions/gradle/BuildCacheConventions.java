@@ -52,11 +52,10 @@ public class BuildCacheConventions {
 			String cacheServer = this.env.get("DEVELOCITY_CACHE_SERVER");
 			if (cacheServer == null) {
 				cacheServer = serverOfCacheUrl(this.env.get("GRADLE_ENTERPRISE_CACHE_URL"));
-				if (cacheServer == null) {
-					cacheServer = "https://ge.spring.io";
-				}
 			}
-			remote.setServer(cacheServer);
+			if (cacheServer != null) {
+				remote.setServer(cacheServer);
+			}
 			String accessKey = this.env.get("DEVELOCITY_ACCESS_KEY");
 			if (accessKey == null) {
 				accessKey = this.env.get("GRADLE_ENTERPRISE_ACCESS_KEY");
