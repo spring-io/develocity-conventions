@@ -35,6 +35,8 @@ The build scans will be customized to:
     - `Git commit` with a value of the commit ID `HEAD`
     - `Git status` when the working copy is dirty.
       The value is the output of `git status --porcelain`.
+    - `Docker` when the `docker` CLI is available.
+      The value is the output of `docker --version`.
  - Add links:
     - `CI build` when building on Bamboo, GitHub Actions, or Jenkins, linking to the build on the CI server.
     - `Git commit build scans`, linking to scans for other builds of the same git commit.

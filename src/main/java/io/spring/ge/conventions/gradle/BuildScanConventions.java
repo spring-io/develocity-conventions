@@ -64,6 +64,7 @@ class BuildScanConventions implements Action<BuildScanConfiguration> {
 		ContinuousIntegration ci = ContinuousIntegration.detect(this.env);
 		tagBuildScan(buildScan, ci);
 		buildScan.background(this::addGitMetadata);
+		buildScan.background(this::addDockerMetadata);
 		addCiMetadata(buildScan, ci);
 		buildScan.getUploadInBackground().set(ci == null);
 		buildScan.capture((settings) -> settings.getFileFingerprints().set(true));
@@ -120,6 +121,10 @@ class BuildScanConventions implements Action<BuildScanConfiguration> {
 			buildScan.tag("dirty");
 			buildScan.value("Git status", gitStatus);
 		});
+	}
+
+	private void addDockerMetadata(BuildScanConfiguration buildScan) {
+		run("docker", "--version").standardOut((dockerVersion) -> buildScan.value("Docker", dockerVersion));
 	}
 
 	private void addCiMetadata(BuildScanConfiguration buildScan, ContinuousIntegration ci) {

@@ -273,6 +273,24 @@ class BuildScanConventionsTests {
 	}
 
 	@Test
+	void buildScanHasDockerCustomValue() {
+		this.processRunner.commandLineOutput.put(Arrays.asList("docker", "--version"),
+				"Docker version 20.10.24, build 297e128");
+		new BuildScanConventions(this.develocity, this.processRunner).execute(this.buildScan);
+		assertThat(this.buildScan.values).containsEntry("Docker", "Docker version 20.10.24, build 297e128");
+	}
+
+	@Test
+	void whenDockerIsNotAvailableThenConventionsCanBeAppliedWithoutFailure() {
+		this.processRunner.failures.put(Arrays.asList("docker", "--version"),
+				new RuntimeException("docker is not available"));
+		new BuildScanConventions(this.develocity, this.processRunner).execute(this.buildScan);
+		assertThatNoException()
+			.isThrownBy(() -> new BuildScanConventions(this.develocity, this.processRunner).execute(this.buildScan));
+		assertThat(this.buildScan.values).doesNotContainKey("Docker");
+	}
+
+	@Test
 	void whenBuildingLocallyThenBackgroundUploadIsEnabled() {
 		new BuildScanConventions(this.develocity, this.processRunner, Collections.emptyMap()).execute(this.buildScan);
 		assertThat(this.buildScan.uploadInBackground.get()).isTrue();
