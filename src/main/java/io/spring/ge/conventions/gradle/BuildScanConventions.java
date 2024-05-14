@@ -65,6 +65,7 @@ class BuildScanConventions implements Action<BuildScanConfiguration> {
 		tagBuildScan(buildScan, ci);
 		buildScan.background(this::addGitMetadata);
 		buildScan.background(this::addDockerMetadata);
+		buildScan.background(this::addDockerComposeMetadata);
 		addCiMetadata(buildScan, ci);
 		buildScan.getUploadInBackground().set(ci == null);
 		buildScan.capture((settings) -> settings.getFileFingerprints().set(true));
@@ -125,6 +126,11 @@ class BuildScanConventions implements Action<BuildScanConfiguration> {
 
 	private void addDockerMetadata(BuildScanConfiguration buildScan) {
 		run("docker", "--version").standardOut((dockerVersion) -> buildScan.value("Docker", dockerVersion));
+	}
+
+	private void addDockerComposeMetadata(BuildScanConfiguration buildScan) {
+		run("docker", "compose", "version")
+			.standardOut((dockerComposeVersion) -> buildScan.value("Docker Compose", dockerComposeVersion));
 	}
 
 	private void addCiMetadata(BuildScanConfiguration buildScan, ContinuousIntegration ci) {

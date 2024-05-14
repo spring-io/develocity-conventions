@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2021 the original author or authors.
+ * Copyright 2020-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import java.io.OutputStream;
 import java.util.function.Consumer;
 
 import org.gradle.api.internal.ProcessOperations;
+import org.gradle.process.ExecResult;
 import org.gradle.process.ExecSpec;
 
 /**
@@ -38,7 +39,7 @@ class ProcessOperationsProcessRunner implements ProcessRunner {
 	@Override
 	public void run(Consumer<ProcessSpec> configurer) {
 		try {
-			this.processOperations.exec((spec) -> configurer.accept(new ExecSpecProcessSpec(spec)));
+			ExecResult exec = this.processOperations.exec((spec) -> configurer.accept(new ExecSpecProcessSpec(spec)));
 		}
 		catch (Exception ex) {
 			throw new RunFailedException(ex);

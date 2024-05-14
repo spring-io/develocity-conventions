@@ -291,6 +291,24 @@ class BuildScanConventionsTests {
 	}
 
 	@Test
+	void buildScanHasDockerComposeCustomValue() {
+		this.processRunner.commandLineOutput.put(Arrays.asList("docker", "compose", "version"),
+				"Docker Compose version v2.17.2");
+		new BuildScanConventions(this.develocity, this.processRunner).execute(this.buildScan);
+		assertThat(this.buildScan.values).containsEntry("Docker Compose", "Docker Compose version v2.17.2");
+	}
+
+	@Test
+	void whenDockerComposeIsNotAvailableThenConventionsCanBeAppliedWithoutFailure() {
+		this.processRunner.failures.put(Arrays.asList("docker", "compose", "version"),
+				new RuntimeException("docker  compose is not available"));
+		new BuildScanConventions(this.develocity, this.processRunner).execute(this.buildScan);
+		assertThatNoException()
+			.isThrownBy(() -> new BuildScanConventions(this.develocity, this.processRunner).execute(this.buildScan));
+		assertThat(this.buildScan.values).doesNotContainKey("Docker Compose");
+	}
+
+	@Test
 	void whenBuildingLocallyThenBackgroundUploadIsEnabled() {
 		new BuildScanConventions(this.develocity, this.processRunner, Collections.emptyMap()).execute(this.buildScan);
 		assertThat(this.buildScan.uploadInBackground.get()).isTrue();
