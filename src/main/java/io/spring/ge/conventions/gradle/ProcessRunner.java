@@ -30,6 +30,7 @@ public interface ProcessRunner {
 	/**
 	 * Runs the process described by the process spec.
 	 * @param configurer configures the {@link ProcessSpec}
+	 * @throws RunFailedException if the process could not be run
 	 */
 	void run(Consumer<ProcessSpec> configurer);
 
@@ -49,6 +50,14 @@ public interface ProcessRunner {
 		 * @param standardOutput the stream for standard output
 		 */
 		void standardOutput(OutputStream standardOutput);
+
+	}
+
+	class RunFailedException extends RuntimeException {
+
+		RunFailedException(Exception cause) {
+			super(cause);
+		}
 
 	}
 

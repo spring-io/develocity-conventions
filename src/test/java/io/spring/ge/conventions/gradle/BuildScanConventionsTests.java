@@ -28,6 +28,7 @@ import com.gradle.develocity.agent.gradle.scan.BuildScanPublishingConfiguration.
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 
@@ -260,6 +261,15 @@ class BuildScanConventionsTests {
 		new BuildScanConventions(this.develocity, this.processRunner).execute(this.buildScan);
 		assertThat(this.buildScan.tags).contains("dirty");
 		assertThat(this.buildScan.values).containsEntry("Git status", "M build.gradle");
+	}
+
+	@Test
+	void whenGitIsNotAvailableThenConventionsCanBeAppliedWithoutFailure() {
+		this.processRunner.failures.put(Arrays.asList("git", "status", "--porcelain"),
+				new RuntimeException("git is not available"));
+		assertThatNoException()
+			.isThrownBy(() -> new BuildScanConventions(this.develocity, this.processRunner).execute(this.buildScan));
+		assertThat(this.buildScan.values).doesNotContainKey("Git status");
 	}
 
 	@Test

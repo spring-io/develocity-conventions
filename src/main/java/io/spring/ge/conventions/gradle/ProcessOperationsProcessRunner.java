@@ -37,7 +37,12 @@ class ProcessOperationsProcessRunner implements ProcessRunner {
 
 	@Override
 	public void run(Consumer<ProcessSpec> configurer) {
-		this.processOperations.exec((spec) -> configurer.accept(new ExecSpecProcessSpec(spec)));
+		try {
+			this.processOperations.exec((spec) -> configurer.accept(new ExecSpecProcessSpec(spec)));
+		}
+		catch (Exception ex) {
+			throw new RunFailedException(ex);
+		}
 	}
 
 	private final class ExecSpecProcessSpec implements ProcessSpec {

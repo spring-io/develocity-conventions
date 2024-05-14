@@ -37,6 +37,8 @@ final class TestProcessRunner implements ProcessRunner {
 
 	final Map<List<String>, String> commandLineOutput = new HashMap<>();
 
+	final Map<List<String>, RuntimeException> failures = new HashMap<>();
+
 	@Override
 	public void run(Consumer<ProcessSpec> configurer) {
 		ProcessSpec processSpec = mock(ProcessSpec.class);
@@ -46,6 +48,11 @@ final class TestProcessRunner implements ProcessRunner {
 		ArgumentCaptor<OutputStream> standardOut = ArgumentCaptor.forClass(OutputStream.class);
 		verify(processSpec).standardOutput(standardOut.capture());
 		List<Object> commandLine = commandLineCaptor.getAllValues();
+		RuntimeException failure = this.failures.get(commandLine);
+		if (failure != null) {
+			failure.fillInStackTrace();
+			throw new RunFailedException(failure);
+		}
 		String output = this.commandLineOutput.get(commandLine);
 		if (output != null) {
 			try {

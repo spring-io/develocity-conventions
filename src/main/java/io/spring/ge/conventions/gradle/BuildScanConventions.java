@@ -25,6 +25,7 @@ import java.util.stream.Collectors;
 
 import com.gradle.develocity.agent.gradle.DevelocityConfiguration;
 import com.gradle.develocity.agent.gradle.scan.BuildScanConfiguration;
+import io.spring.ge.conventions.gradle.ProcessRunner.RunFailedException;
 import org.gradle.api.Action;
 
 /**
@@ -155,11 +156,16 @@ class BuildScanConventions implements Action<BuildScanConfiguration> {
 
 	private RunResult run(Object... commandLine) {
 		ByteArrayOutputStream standardOutput = new ByteArrayOutputStream();
-		this.processRunner.run((spec) -> {
-			spec.commandLine(commandLine);
-			spec.standardOutput(standardOutput);
-		});
-		return new RunResult(standardOutput.toString().trim());
+		try {
+			this.processRunner.run((spec) -> {
+				spec.commandLine(commandLine);
+				spec.standardOutput(standardOutput);
+			});
+			return new RunResult(standardOutput.toString().trim());
+		}
+		catch (RunFailedException ex) {
+			return new RunResult();
+		}
 	}
 
 	private boolean hasText(String string) {
@@ -170,12 +176,16 @@ class BuildScanConventions implements Action<BuildScanConfiguration> {
 
 		private final String standardOutput;
 
+		private RunResult() {
+			this.standardOutput = null;
+		}
+
 		private RunResult(String standardOutput) {
 			this.standardOutput = standardOutput;
 		}
 
 		private void standardOut(Consumer<String> consumer) {
-			if (this.standardOutput.length() > 0) {
+			if (this.standardOutput != null && this.standardOutput.length() > 0) {
 				consumer.accept(this.standardOutput);
 			}
 		}
