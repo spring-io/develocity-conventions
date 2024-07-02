@@ -1,6 +1,6 @@
-# Gradle Enterprise Conventions
+# Develocity Conventions
 
-Conventions for Maven and Gradle projects that use the Gradle Enterprise instance hosted at [ge.spring.io](https://ge.spring.io).
+Conventions for Maven and Gradle projects that use the Develocity instance hosted at [ge.spring.io](https://ge.spring.io).
 
 ## Build cache conventions
 
@@ -120,7 +120,7 @@ Now apply the plugin in `settings.gradle`, alongside the `com.gradle.develocity`
 plugins {
 	// …
 	id "com.gradle.develocity" version "<<version>>"
-	id "io.spring.ge.conventions" version "<<version>>"
+	id "io.spring.develocity.conventions" version "<<version>>"
 	// …
 }
 ```
@@ -133,8 +133,8 @@ To use the conventions, create a `.mvn/extensions.xml` file in the root of the p
 <?xml version="1.0" encoding="UTF-8"?>
 <extensions>
         <extension>
-                <groupId>io.spring.ge.conventions</groupId>
-                <artifactId>gradle-enterprise-conventions-maven-extension</artifactId>
+                <groupId>io.spring.develocity.conventions</groupId>
+                <artifactId>develocity-conventions-maven-extension</artifactId>
                 <version><<version>></version>
         </extension>
 </extensions>

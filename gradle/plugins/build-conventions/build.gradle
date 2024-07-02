@@ -12,7 +12,7 @@ gradlePlugin {
 	plugins {
 		conventionsPlugin {
 			id = "build-conventions"
-			implementationClass = "io.spring.ge.conventions.build.BuildConventionsPlugin"
+			implementationClass = "io.spring.develocity.conventions.build.BuildConventionsPlugin"
 		}
 	}
 }

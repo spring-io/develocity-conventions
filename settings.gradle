@@ -1,20 +1,9 @@
 pluginManagement {
 	includeBuild "gradle/plugins/build-conventions"
-	repositories {
-		mavenCentral()
-		gradlePluginPortal()
-	}
-	resolutionStrategy {
-		eachPlugin {
-			if (requested.id.id == "io.spring.javaformat") {
-				useModule "io.spring.javaformat:spring-javaformat-gradle-plugin:${requested.version}"
-			}
-		}
-	}
 }
 
-rootProject.name = 'gradle-enterprise-conventions'
+rootProject.name = 'develocity-conventions'
 
-include("gradle-enterprise-conventions-core")
-include("gradle-enterprise-conventions-gradle-plugin")
-include("gradle-enterprise-conventions-maven-extension")
+include("develocity-conventions-core")
+include("develocity-conventions-gradle-plugin")
+include("develocity-conventions-maven-extension")

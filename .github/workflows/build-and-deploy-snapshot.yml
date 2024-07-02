@@ -7,7 +7,7 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
 jobs:
   build:
-    if: ${{ github.repository == 'spring-io/gradle-enterprise-conventions' }}
+    if: ${{ github.repository == 'spring-io/develocity-conventions' }}
     name: Build and deploy snapshot
     runs-on: ubuntu-latest
     steps:
@@ -35,7 +35,7 @@ jobs:
           uri: 'https://repo.spring.io'
           username: ${{ secrets.ARTIFACTORY_USERNAME }}
           password: ${{ secrets.ARTIFACTORY_PASSWORD }}
-          build-name: gradle-enterprise-conventions
+          build-name: develocity-conventions
           repository: 'libs-snapshot-local'
           folder: 'deployment-repository'
           signing-key: ${{ secrets.GPG_PRIVATE_KEY }}

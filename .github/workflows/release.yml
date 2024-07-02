@@ -18,7 +18,7 @@ jobs:
     outputs:
       version: ${{ steps.version-from-tag.outputs.version }}
   build-and-stage-release:
-    if: ${{ github.repository == 'spring-io/gradle-enterprise-conventions' }}
+    if: ${{ github.repository == 'spring-io/develocity-conventions' }}
     name: Build and stage release
     needs: get-version
     runs-on: ubuntu-latest
@@ -47,7 +47,7 @@ jobs:
           uri: 'https://repo.spring.io'
           username: ${{ secrets.ARTIFACTORY_USERNAME }}
           password: ${{ secrets.ARTIFACTORY_PASSWORD }}
-          build-name: ${{ format('gradle-enterprise-conventions-{0}', needs.get-version.outputs.version)}}
+          build-name: ${{ format('develocity-conventions-{0}', needs.get-version.outputs.version)}}
           repository: 'libs-staging-local'
           folder: 'deployment-repository'
           signing-key: ${{ secrets.GPG_PRIVATE_KEY }}
@@ -66,7 +66,7 @@ jobs:
         env:
           JF_ENV_SPRING: ${{ secrets.JF_ARTIFACTORY_SPRING }}
       - name: Download release artifacts
-        run: jf rt download --spec .github/release-artifacts.spec --spec-vars 'buildName=${{ format('gradle-enterprise-conventions-{0}', needs.get-version.outputs.version) }};buildNumber=${{ github.run_number }}'
+        run: jf rt download --spec .github/release-artifacts.spec --spec-vars 'buildName=${{ format('develocity-conventions-{0}', needs.get-version.outputs.version) }};buildNumber=${{ github.run_number }}'
       - name: Sync
         uses: spring-io/nexus-sync-action@42477a2230a2f694f9eaa4643fa9e76b99b7ab84 # v0.0.1
         with:
@@ -91,7 +91,7 @@ jobs:
         env:
           JF_ENV_SPRING: ${{ secrets.JF_ARTIFACTORY_SPRING }}
       - name: Promote build
-        run: jfrog rt build-promote ${{ format('gradle-enterprise-conventions-{0}', needs.get-version.outputs.version)}} ${{ github.run_number }} libs-release-local
+        run: jfrog rt build-promote ${{ format('develocity-conventions-{0}', needs.get-version.outputs.version)}} ${{ github.run_number }} libs-release-local
   create-github-release:
     name: Create GitHub release
     needs:
