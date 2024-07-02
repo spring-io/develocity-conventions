@@ -1,0 +1,32 @@
+plugins {
+	id "checkstyle"
+	id "java-gradle-plugin"
+	id "io.spring.javaformat" version "0.0.39"
+}
+
+repositories {
+	mavenCentral()
+}
+
+gradlePlugin {
+	plugins {
+		conventionsPlugin {
+			id = "build-conventions"
+			implementationClass = "io.spring.ge.conventions.build.BuildConventionsPlugin"
+		}
+	}
+}
+
+sourceCompatibility = "1.8"
+targetCompatibility = "1.8"
+
+dependencies {
+	checkstyle("io.spring.javaformat:spring-javaformat-checkstyle:0.0.39")
+	implementation("io.spring.javaformat:spring-javaformat-gradle-plugin:0.0.39")
+}
+
+checkstyle {
+	def archive = configurations.checkstyle.filter { it.name.startsWith("spring-javaformat-checkstyle")}
+	config = resources.text.fromArchiveEntry(archive, "io/spring/javaformat/checkstyle/checkstyle.xml")
+	toolVersion = 9.3
+}

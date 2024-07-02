@@ -1,91 +1,25 @@
 plugins {
-	id "checkstyle"
-	id "io.spring.javaformat" version "$javaFormatVersion"
+	id "build-conventions"
 	id "java"
 	id "maven-publish"
 }
 
 description = "Gradle Enterprise Conventions Core"
-group = 'io.spring.ge.conventions'
-
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
 
 repositories {
 	mavenCentral()
 }
 
 dependencies {
-	checkstyle("io.spring.javaformat:spring-javaformat-checkstyle:${javaFormatVersion}")
-
 	testImplementation("org.assertj:assertj-core:3.24.2")
 	testImplementation("org.junit.jupiter:junit-jupiter:5.10.0")
 	testImplementation("org.mockito:mockito-core:4.11.0")
-}
-
-test {
-	useJUnitPlatform()
-}
-
-java {
-	withJavadocJar()
-	withSourcesJar()
-}
-
-checkstyle {
-	def archive = configurations.checkstyle.filter { it.name.startsWith("spring-javaformat-checkstyle")}
-	config = resources.text.fromArchiveEntry(archive, "io/spring/javaformat/checkstyle/checkstyle.xml")
-	toolVersion = 9.3
-}
-
-tasks.withType(GenerateModuleMetadata).all {
-	enabled = false
-}
-
-if (project.hasProperty("distributionRepository")) {
-	publishing {
-		repositories {
-			maven {
-				url = "${distributionRepository}"
-				name = "deployment"
-			}
-		}
-	}
 }
 
 publishing {
 	publications {
 		maven(MavenPublication) {
 			from components.java
-		}
-		withType(MavenPublication) { mavenPublication ->
-			pom {
-				name = project.description
-				description = project.description
-				url = 'https://github.com/spring-io/gradle-enterprise-conventions'
-				organization {
-					name = 'Pivotal Software, Inc.'
-					url = 'https://spring.io'
-				}
-				licenses {
-					license {
-						name = 'The Apache Software License, Version 2.0'
-						url = 'https://www.apache.org/licenses/LICENSE-2.0.txt'
-					}
-				}
-				scm {
-					url = 'https://github.com/spring-io/gradle-enterprise-conventions'
-					connection = 'scm:git:https://github.com/spring-io/gradle-enterprise-conventions'
-				}
-				developers {
-					developer {
-						id = 'wilkinsona'
-						name = 'Andy Wilkinson'
-						email = 'awilkinson@pivotal.io'
-						roles = ["Project lead"]
-					}
-				}
-			}
 		}
 	}
 }
