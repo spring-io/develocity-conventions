@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component-set>
+	<components>
+		<component>
+			<role>com.gradle.develocity.agent.maven.api.DevelocityListener</role>
+			<role-hint>conventions-develocity-listener</role-hint>
+			<implementation>io.spring.ge.conventions.maven.ConventionsDevelocityListener</implementation>
+		</component>
+	</components>
+</component-set>

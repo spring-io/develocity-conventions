@@ -1,0 +1,105 @@
+plugins {
+	id "checkstyle"
+	id "io.spring.javaformat" version "$javaFormatVersion"
+	id "java-gradle-plugin"
+	id "maven-publish"
+}
+
+description = "Gradle Enterprise Conventions Gradle plugin"
+group = 'io.spring.ge.conventions'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+	mavenCentral()
+	gradlePluginPortal()
+}
+
+dependencies {
+	checkstyle("io.spring.javaformat:spring-javaformat-checkstyle:${javaFormatVersion}")
+
+	compileOnly("com.gradle:develocity-gradle-plugin:${gradleEnterprisePluginVersion}")
+	
+	implementation(project(":gradle-enterprise-conventions-core"))
+
+	testImplementation("com.gradle:develocity-gradle-plugin:${gradleEnterprisePluginVersion}")
+	testImplementation("org.assertj:assertj-core:3.24.2")
+	testImplementation("org.junit.jupiter:junit-jupiter:5.10.0")
+	testImplementation("org.mockito:mockito-core:4.11.0")
+}
+
+gradlePlugin {
+	plugins {
+		gradleEnterprisePlugin {
+			displayName = project.description
+			description = project.description
+			id = 'io.spring.ge.conventions'
+			implementationClass = 'io.spring.ge.conventions.gradle.GradleEnterpriseConventionsPlugin'
+		}
+	}
+}
+
+test {
+	useJUnitPlatform()
+}
+
+java {
+	withJavadocJar()
+	withSourcesJar()
+}
+
+checkstyle {
+	def archive = configurations.checkstyle.filter { it.name.startsWith("spring-javaformat-checkstyle")}
+	config = resources.text.fromArchiveEntry(archive, "io/spring/javaformat/checkstyle/checkstyle.xml")
+	toolVersion = 9.3
+}
+
+tasks.withType(GenerateModuleMetadata).all {
+	enabled = false
+}
+
+if (project.hasProperty("distributionRepository")) {
+	publishing {
+		repositories {
+			maven {
+				url = "${distributionRepository}"
+				name = "deployment"
+			}
+		}
+	}
+}
+
+publishing {
+	publications {
+		withType(MavenPublication) { mavenPublication -> 
+			pom {
+				name = project.description
+				description = project.description
+				url = 'https://github.com/spring-io/gradle-enterprise-conventions'
+				organization {
+					name = 'Pivotal Software, Inc.'
+					url = 'https://spring.io'
+				}
+				licenses {
+					license {
+						name = 'The Apache Software License, Version 2.0'
+						url = 'https://www.apache.org/licenses/LICENSE-2.0.txt'
+					}
+				}
+				scm {
+					url = 'https://github.com/spring-io/gradle-enterprise-conventions'
+					connection = 'scm:git:https://github.com/spring-io/gradle-enterprise-conventions'
+				}
+				developers {
+					developer {
+						id = 'wilkinsona'
+						name = 'Andy Wilkinson'
+						email = 'awilkinson@pivotal.io'
+						roles = ["Project lead"]
+					}
+				}
+			}
+		}
+	}
+}

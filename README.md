@@ -1,6 +1,6 @@
 # Gradle Enterprise Conventions
 
-Conventions for Gradle projects that use the Gradle Enterprise instance hosted at [ge.spring.io](https://ge.spring.io).
+Conventions for Maven and Gradle projects that use the Gradle Enterprise instance hosted at [ge.spring.io](https://ge.spring.io).
 
 ## Build cache conventions
 
@@ -26,7 +26,9 @@ When applied alongside the [Develocity Plugin](https://plugins.gradle.org/plugin
 The build scans will be customized to:
 
 - Add tags:
-    - `JDK-<version>`, where `<version>` is the value of the `toolchainVersion` project property or, when not set, the specification version of the JDK running the build.
+    - `JDK-<version>`.
+      When using Maven, `<version>` is the specification version of the JDK running the build.
+      When using Gradle, `<version>` is the value of the `toolchainVersion` project property or, when not set, it's the specification version of the JDK running the build.
     - `CI` or `Local` depending on where the build is executing.
     - `dirty` if the git working copy is dirty.
     - Name of the git branch being built.
@@ -96,6 +98,8 @@ Jenkins is detected by looking for an environment variable named `JENKINS_URL`.
 Releases of the conventions are published to Maven Central.
 Snapshots are published to https://repo.spring.io/snapshot.
 
+### Gradle
+
 The first step in using the conventions is to make the necessary repository available for plugin resolution.
 This is done by configuring a plugin management repository in `settings.gradle`, as shown in the following example:
 
@@ -120,3 +124,22 @@ plugins {
 	// …
 }
 ```
+
+### Maven
+
+To use the conventions, create a `.mvn/extensions.xml` file in the root of the project:
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<extensions>
+        <extension>
+                <groupId>io.spring.ge.conventions</groupId>
+                <artifactId>gradle-enterprise-conventions-maven-extension</artifactId>
+                <version><<version>></version>
+        </extension>
+</extensions>
+```
+
+Any existing `.mvn/gradle-enterprise.xml` file should be deleted in favor of the configuration that's provided by the conventions.
+Lastly, add `.mvn/.develocity/` to the project's `.gitignore` file.
+The conventions are ready to use.
