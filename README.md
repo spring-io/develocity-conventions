@@ -39,6 +39,8 @@ The build scans will be customized to:
       The value is the output of `git status --porcelain`.
     - `Docker` when the `docker` CLI is available.
       The value is the output of `docker --version`.
+    - `Docker Compose` when `docker compose` CLI is available.
+      The value is the output of `docker compose version`.
  - Add links:
     - `CI build` when building on Bamboo, GitHub Actions, or Jenkins, linking to the build on the CI server.
     - `Git commit build scans`, linking to scans for other builds of the same git commit.
