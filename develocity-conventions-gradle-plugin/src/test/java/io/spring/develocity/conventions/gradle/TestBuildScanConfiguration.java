@@ -38,7 +38,7 @@ import org.gradle.api.specs.Spec;
  *
  * @author Andy Wilkinson
  */
-public final class TestBuildScanConfiguration implements BuildScanConfiguration {
+class TestBuildScanConfiguration implements BuildScanConfiguration {
 
 	final TestBuildScanDataObfuscation obfuscation = new TestBuildScanDataObfuscation();
 

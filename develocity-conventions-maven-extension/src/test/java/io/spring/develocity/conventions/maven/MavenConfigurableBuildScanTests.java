@@ -49,7 +49,7 @@ import static org.mockito.Mockito.mock;
  *
  * @author Andy Wilkinson
  */
-public class MavenConfigurableBuildScanTests {
+class MavenConfigurableBuildScanTests {
 
 	private final TestBuildScanApi buildScanApi = new TestBuildScanApi();
 

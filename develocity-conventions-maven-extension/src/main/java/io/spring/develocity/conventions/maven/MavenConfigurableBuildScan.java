@@ -25,6 +25,11 @@ import com.gradle.develocity.agent.maven.api.scan.BuildScanApi;
 import com.gradle.develocity.agent.maven.api.scan.BuildScanPublishing.PublishingContext;
 import io.spring.develocity.conventions.core.ConfigurableBuildScan;
 
+/**
+ * {@link ConfigurableBuildScan} for Maven builds.
+ *
+ * @author Andy Wilkinson
+ */
 class MavenConfigurableBuildScan implements ConfigurableBuildScan {
 
 	private final BuildScanApi buildScan;

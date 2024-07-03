@@ -31,7 +31,7 @@ import org.codehaus.plexus.component.annotations.Component;
  */
 @Component(role = DevelocityListener.class, hint = "convention-develocity-maven-extension",
 		description = "Develocity conventions Maven extension")
-public final class ConventionsDevelocityListener implements DevelocityListener {
+public class ConventionsDevelocityListener implements DevelocityListener {
 
 	@Override
 	public void configure(DevelocityApi develocity, MavenSession MavenSession) throws Exception {

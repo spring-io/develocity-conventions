@@ -34,7 +34,7 @@ import static org.mockito.Mockito.verify;
  *
  * @author Andy Wilkinson
  */
-final class TestProcessRunner implements ProcessRunner {
+class TestProcessRunner implements ProcessRunner {
 
 	final Map<List<String>, String> commandLineOutput = new HashMap<>();
 

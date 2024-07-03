@@ -26,7 +26,7 @@ import org.gradle.api.provider.Provider;
  * @param <T> type of the value of the property
  * @author Andy Wilkinson
  */
-public class TestProperty<T> implements Property<T> {
+class TestProperty<T> implements Property<T> {
 
 	private T value;
 
