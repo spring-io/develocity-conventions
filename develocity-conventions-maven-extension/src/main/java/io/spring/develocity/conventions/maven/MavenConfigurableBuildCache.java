@@ -79,7 +79,11 @@ class MavenConfigurableBuildCache implements ConfigurableBuildCache {
 
 		@Override
 		public void setServer(String server) {
-			this.remoteBuildCache.getServer().setUrl(server);
+			String url = server;
+			if (!url.endsWith("/cache/")) {
+				url = url + "/cache/";
+			}
+			this.remoteBuildCache.getServer().setUrl(url);
 		}
 
 	}

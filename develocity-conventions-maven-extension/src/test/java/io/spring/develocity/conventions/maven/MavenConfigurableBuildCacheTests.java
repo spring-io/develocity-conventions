@@ -63,7 +63,8 @@ class MavenConfigurableBuildCacheTests {
 	@Test
 	void remoteBuildCacheCanHaveItsServerConfigured() {
 		this.buildCache.remote((remote) -> remote.setServer("https://ge.spring.io"));
-		assertThat(this.buildCacheApi.getRemote().getServer().getUrl()).isEqualTo(URI.create("https://ge.spring.io"));
+		assertThat(this.buildCacheApi.getRemote().getServer().getUrl())
+			.isEqualTo(URI.create("https://ge.spring.io/cache/"));
 	}
 
 	private static final class TestBuildCacheApi implements BuildCacheApi {
