@@ -44,7 +44,7 @@ class ProcessBuilderProcessRunner implements ProcessRunner {
 			Files.copy(spec.output, spec.outputStream);
 		}
 		catch (Exception ex) {
-			throw new RuntimeException("Process failed", ex);
+			throw new RunFailedException(ex);
 		}
 	}
 
