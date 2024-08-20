@@ -79,20 +79,8 @@ class GradleConfigurableBuildCacheTests {
 		}
 
 		@Override
-		@Deprecated
-		public <T extends DirectoryBuildCache> T local(Class<T> cacheType) {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
 		public void local(Action<? super DirectoryBuildCache> action) {
 			action.execute(this.local);
-		}
-
-		@Override
-		@Deprecated
-		public <T extends DirectoryBuildCache> T local(Class<T> cacheType, Action<? super T> action) {
-			throw new UnsupportedOperationException();
 		}
 
 		@Override

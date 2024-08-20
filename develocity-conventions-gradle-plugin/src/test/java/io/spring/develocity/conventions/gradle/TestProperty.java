@@ -16,6 +16,8 @@
 
 package io.spring.develocity.conventions.gradle;
 
+import java.util.function.BiFunction;
+
 import org.gradle.api.Transformer;
 import org.gradle.api.provider.Property;
 import org.gradle.api.provider.Provider;
@@ -110,6 +112,27 @@ class TestProperty<T> implements Property<T> {
 
 	@Override
 	public Property<T> value(Provider<? extends T> value) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	@Deprecated
+	public Provider<T> forUseAtConfigurationTime() {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public <B, R> Provider<R> zip(Provider<B> arg0, BiFunction<T, B, R> arg1) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public void disallowUnsafeRead() {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public void finalizeValueOnRead() {
 		throw new UnsupportedOperationException();
 	}
 

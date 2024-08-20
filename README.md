@@ -102,6 +102,8 @@ Snapshots are published to https://repo.spring.io/snapshot.
 
 ### Gradle
 
+The conventions support Gradle 7.4 and later.
+
 The first step in using the conventions is to make the necessary repository available for plugin resolution.
 This is done by configuring a plugin management repository in `settings.gradle`, as shown in the following example:
 
