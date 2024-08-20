@@ -148,6 +148,11 @@ class TestBuildScanConfiguration implements BuildScanConfiguration {
 			throw new UnsupportedOperationException();
 		}
 
+		@Override
+		public void externalProcessName(Function<? super String, ? extends String> obfuscator) {
+			throw new UnsupportedOperationException();
+		}
+
 	}
 
 	static final class TestBuildScanCaptureSettings implements BuildScanCaptureConfiguration {
@@ -166,6 +171,11 @@ class TestBuildScanConfiguration implements BuildScanConfiguration {
 
 		@Override
 		public Property<Boolean> getTestLogging() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public Property<Boolean> getResourceUsage() {
 			throw new UnsupportedOperationException();
 		}
 

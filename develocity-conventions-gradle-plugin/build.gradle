@@ -2,6 +2,7 @@ plugins {
 	id "build-conventions"
 	id "java-gradle-plugin"
 	id "maven-publish"
+	id "io.spring.compatibility-test" version "0.0.2"
 }
 
 description = "Develocity Conventions Gradle plugin"
@@ -13,7 +14,7 @@ repositories {
 
 dependencies {
 	compileOnly("com.gradle:develocity-gradle-plugin:${develocityPluginVersion}")
-	
+
 	implementation(project(":develocity-conventions-core"))
 
 	testImplementation("com.gradle:develocity-gradle-plugin:${develocityPluginVersion}")
@@ -30,5 +31,16 @@ gradlePlugin {
 			id = 'io.spring.develocity.conventions'
 			implementationClass = 'io.spring.develocity.conventions.gradle.DevelocityConventionsPlugin'
 		}
+	}
+}
+
+compatibilityTest {
+	useJUnitPlatform()
+	dependency('Develocity Gradle Plugin') { develocityPlugin ->
+		develocityPlugin.groupId = 'com.gradle'
+		develocityPlugin.artifactId = 'develocity-gradle-plugin'
+		develocityPlugin.versions = [
+			'3.17.2'
+		]
 	}
 }
