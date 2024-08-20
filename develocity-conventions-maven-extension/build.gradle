@@ -2,6 +2,7 @@ plugins {
 	id "build-conventions"
 	id "java"
 	id "maven-publish"
+	id "io.spring.compatibility-test" version "0.0.2"
 }
 
 description = "Develocity Conventions Maven extension"
@@ -14,7 +15,7 @@ dependencies {
 	compileOnly("org.apache.maven:maven-core:3.6.3")
 	compileOnly("org.codehaus.plexus:plexus-component-annotations:1.7.1")
 	
-	implementation("com.gradle:develocity-maven-extension:1.21.5")
+	implementation("com.gradle:develocity-maven-extension:1.22")
 	implementation(project(":develocity-conventions-core"))
 
 	testImplementation("org.assertj:assertj-core:3.24.2")
@@ -27,5 +28,16 @@ publishing {
 		maven(MavenPublication) {
 			from components.java
 		}
+	}
+}
+
+compatibilityTest {
+	useJUnitPlatform()
+	dependency('Develocity Maven Extension') { develocityExtension ->
+		develocityExtension.groupId = 'com.gradle'
+		develocityExtension.artifactId = 'develocity-maven-extension'
+		develocityExtension.versions = [
+			'1.21.6'
+		]
 	}
 }

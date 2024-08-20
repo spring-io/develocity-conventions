@@ -279,6 +279,16 @@ class MavenConfigurableBuildScanTests {
 				this.fileFingerprints = capture;
 			}
 
+			@Override
+			public boolean isResourceUsage() {
+				throw new UnsupportedOperationException();
+			}
+
+			@Override
+			public void setResourceUsage(boolean capture) {
+				throw new UnsupportedOperationException();
+			}
+
 		}
 
 		static final class TestBuildScanDataObfuscation implements BuildScanDataObfuscation {
@@ -297,6 +307,11 @@ class MavenConfigurableBuildScanTests {
 
 			@Override
 			public void username(Function<? super String, ? extends String> obfuscator) {
+				throw new UnsupportedOperationException();
+			}
+
+			@Override
+			public void externalProcessName(Function<? super String, ? extends String> obfuscator) {
 				throw new UnsupportedOperationException();
 			}
 
