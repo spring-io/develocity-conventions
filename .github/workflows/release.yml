@@ -78,6 +78,17 @@ jobs:
           close: true
           release: true
           generate-checksums: true
+      - name: Await
+        shell: bash
+        run: |
+          url=${{ format('https://repo.maven.apache.org/maven2/io/spring/develocity/conventions/develocity-conventions-core/{0}/develocity-conventions-core-{0}.jar', needs.get-version.outputs.version) }}
+          echo "Waiting for $url"
+          until curl --fail --head --silent $url > /dev/null
+          do
+            echo "."
+            sleep 60
+          done
+          echo "$url is available"
   promote-release:
     name: Promote release
     needs:
