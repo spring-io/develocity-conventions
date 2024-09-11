@@ -118,12 +118,11 @@ pluginManagement {
 
 In the example above, `gradlePluginPortal()` is declared to allow other plugins to continue to be resolved from the portal.
 
-Now apply the plugin in `settings.gradle`, alongside the `com.gradle.develocity` plugin:
+Now apply the plugin in `settings.gradle`:
 
 ```groovy
 plugins {
 	// …
-	id "com.gradle.develocity" version "<<version>>"
 	id "io.spring.develocity.conventions" version "<<version>>"
 	// …
 }

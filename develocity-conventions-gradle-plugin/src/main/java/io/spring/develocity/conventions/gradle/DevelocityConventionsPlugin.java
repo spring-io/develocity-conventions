@@ -47,10 +47,10 @@ public class DevelocityConventionsPlugin implements Plugin<Settings> {
 
 	@Override
 	public void apply(Settings settings) {
+		settings.getPlugins().apply(DevelocityPlugin.class);
 		DevelocityConfiguration extension = settings.getExtensions().getByType(DevelocityConfiguration.class);
-		settings.getPlugins()
-			.withType(DevelocityPlugin.class, (plugin) -> configureBuildScanConventions(extension,
-					extension.getBuildScan(), settings.getStartParameter(), settings.getRootDir()));
+		configureBuildScanConventions(extension, extension.getBuildScan(), settings.getStartParameter(),
+				settings.getRootDir());
 		if (settings.getStartParameter().isBuildCacheEnabled()) {
 			settings.buildCache((buildCacheConfiguration) -> new BuildCacheConventions()
 				.execute(new GradleConfigurableBuildCache(extension.getBuildCache(), buildCacheConfiguration)));

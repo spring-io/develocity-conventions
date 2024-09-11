@@ -104,7 +104,6 @@ class DevelocityConventionsPluginIntegrationTests {
 		write(new File(projectDir, "gradle.properties"), (writer) -> writer.println("org.gradle.caching=true"));
 		write(new File(projectDir, "settings.gradle"), (writer) -> {
 			writer.println("plugins {");
-			writer.println("    id 'com.gradle.develocity'");
 			writer.println("    id 'io.spring.develocity.conventions' version '" + version() + "'");
 			writer.println("}");
 			writer.println("gradle.afterProject { project -> project.ext['settings'] = settings }");
@@ -129,7 +128,6 @@ class DevelocityConventionsPluginIntegrationTests {
 		write(new File(projectDir, "gradle.properties"), (writer) -> writer.println("org.gradle.caching=true"));
 		write(new File(projectDir, "settings.gradle"), (writer) -> {
 			writer.println("plugins {");
-			writer.println("    id 'com.gradle.develocity'");
 			writer.println("    id 'io.spring.develocity.conventions' version '" + version() + "'");
 			writer.println("}");
 			writer.println("include 'sub'");
