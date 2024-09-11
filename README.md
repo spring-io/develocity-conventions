@@ -93,6 +93,8 @@ Bamboo is detected by looking for an environment variable named `bamboo_resultsU
 Concourse does not automatically set any environment variables in the build's container that allow its use to be detected.
 To work around this, an environment variable named `CI` can be set on the task.
 
+GitHub Actions is detected by looking for an environment variable named `GITHUB_ACTIONS`.
+
 Jenkins is detected by looking for an environment variable named `JENKINS_URL`.
 
 ## Using the conventions
