@@ -34,7 +34,7 @@ import org.codehaus.plexus.component.annotations.Component;
 public class ConventionsDevelocityListener implements DevelocityListener {
 
 	@Override
-	public void configure(DevelocityApi develocity, MavenSession MavenSession) throws Exception {
+	public void configure(DevelocityApi develocity, MavenSession mavenSession) throws Exception {
 		new BuildScanConventions(new ProcessBuilderProcessRunner()).execute(new MavenConfigurableDevelocity(develocity),
 				new MavenConfigurableBuildScan(develocity.getBuildScan()));
 		new BuildCacheConventions().execute(new MavenConfigurableBuildCache(develocity.getBuildCache()));
