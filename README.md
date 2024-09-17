@@ -130,6 +130,11 @@ plugins {
 }
 ```
 
+The behavior of the conventions can be controlled with a `spring.build-type` property in `gradle.properties`.
+If the property is present, it must have a value of `oss` in order to publish build scans and use the build cache.
+Any other value will disable both build scan publishing and the build cache.
+For example, you may want to update `gradle.properties` and set `spring.build-type` to `cve` when working on a fix for a security vulnerability.
+
 ### Maven
 
 To use the conventions, create a `.mvn/extensions.xml` file in the root of the project:

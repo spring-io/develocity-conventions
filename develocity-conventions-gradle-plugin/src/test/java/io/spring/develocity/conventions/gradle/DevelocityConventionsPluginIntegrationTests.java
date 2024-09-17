@@ -68,6 +68,25 @@ class DevelocityConventionsPluginIntegrationTests {
 	}
 
 	@Test
+	void whenThePluginIsAppliedAndTheSpringBuildTypeIsNotOssThenBuildScanConventionsAreNotApplied(
+			@TempDir File projectDir) {
+		prepareProject(projectDir);
+		write(new File(projectDir, "gradle.properties"), (writer) -> writer.println("spring.build-type=other"));
+		BuildResult result = build(projectDir, "6.0.1", "verifyBuildScanConfig");
+		assertThat(result.getOutput()).contains("Build scan server: null");
+		assertThat(result.getOutput()).contains("Capture task input files: false");
+	}
+
+	@Test
+	void whenThePluginIsAppliedAndTheSpringBuildTypeIsOssThenBuildScanConventionsAreApplied(@TempDir File projectDir) {
+		prepareProject(projectDir);
+		write(new File(projectDir, "gradle.properties"), (writer) -> writer.println("spring.build-type=oss"));
+		BuildResult result = build(projectDir, "6.0.1", "verifyBuildScanConfig");
+		assertThat(result.getOutput()).contains("Build scan server: https://ge.spring.io");
+		assertThat(result.getOutput()).contains("Capture task input files: true");
+	}
+
+	@Test
 	void whenThePluginIsAppliedAndPropertiesTaskIsExecutedThenBuildScanConventionsAreNotApplied(
 			@TempDir File projectDir) {
 		prepareProject(projectDir);
@@ -98,6 +117,23 @@ class DevelocityConventionsPluginIntegrationTests {
 		prepareProject(projectDir);
 		BuildResult result = build(projectDir, "6.0.1", "verifyBuildCacheConfig", "--no-build-cache");
 		assertThat(result.getOutput()).contains("Build cache server: null");
+	}
+
+	@Test
+	void whenThePluginIsAppliedAndTheSpringBuildTypeIsNotOssThenBuildCacheConventionsAreNotApplied(
+			@TempDir File projectDir) {
+		prepareProject(projectDir);
+		write(new File(projectDir, "gradle.properties"), (writer) -> writer.println("spring.build-type=other"));
+		BuildResult result = build(projectDir, "6.0.1", "verifyBuildCacheConfig");
+		assertThat(result.getOutput()).contains("Build cache server: null");
+	}
+
+	@Test
+	void whenThePluginIsAppliedAndTheSpringBuildTypeIsOssThenBuildCacheConventionsAreApplied(@TempDir File projectDir) {
+		prepareProject(projectDir);
+		write(new File(projectDir, "gradle.properties"), (writer) -> writer.println("spring.build-type=oss"));
+		BuildResult result = build(projectDir, "6.0.1", "verifyBuildCacheConfig");
+		assertThat(result.getOutput()).contains("Build cache server: https://ge.spring.io");
 	}
 
 	private void prepareProject(File projectDir) {
@@ -151,7 +187,7 @@ class DevelocityConventionsPluginIntegrationTests {
 
 	private void write(File file, Consumer<PrintWriter> consumer) {
 		file.getParentFile().mkdirs();
-		try (PrintWriter writer = new PrintWriter(new FileWriter(file))) {
+		try (PrintWriter writer = new PrintWriter(new FileWriter(file, true))) {
 			consumer.accept(writer);
 		}
 		catch (IOException ex) {

@@ -17,6 +17,11 @@
 package io.spring.develocity.conventions.gradle;
 
 import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.UncheckedIOException;
+import java.util.Properties;
 
 import javax.inject.Inject;
 
@@ -49,19 +54,52 @@ public class DevelocityConventionsPlugin implements Plugin<Settings> {
 	public void apply(Settings settings) {
 		settings.getPlugins().apply(DevelocityPlugin.class);
 		DevelocityConfiguration extension = settings.getExtensions().getByType(DevelocityConfiguration.class);
-		configureBuildScanConventions(extension, extension.getBuildScan(), settings.getStartParameter(),
-				settings.getRootDir());
+		if (!isOssBuild(settings)) {
+			extension
+				.buildScan((buildScan) -> buildScan.publishing((publishing) -> publishing.onlyIf((context) -> false)));
+			return;
+		}
+		if (isBuildScanEnabled(settings)) {
+			configureBuildScanConventions(extension, extension.getBuildScan(), settings.getStartParameter(),
+					settings.getRootDir());
+		}
 		if (settings.getStartParameter().isBuildCacheEnabled()) {
 			settings.buildCache((buildCacheConfiguration) -> new BuildCacheConventions()
 				.execute(new GradleConfigurableBuildCache(extension.getBuildCache(), buildCacheConfiguration)));
 		}
 	}
 
+	private boolean isOssBuild(Settings settings) {
+		Properties properties = new Properties();
+		File propertiesFile = new File(settings.getRootDir(), "gradle.properties");
+		if (propertiesFile.exists()) {
+			try (Reader reader = new FileReader(propertiesFile)) {
+				properties.load(reader);
+			}
+			catch (IOException ex) {
+				throw new UncheckedIOException(ex);
+			}
+		}
+		String buildType = properties.getProperty("spring.build-type");
+		return buildType == null || "oss".equals(buildType);
+	}
+
+	private boolean isBuildScanEnabled(Settings settings) {
+		StartParameter startParameter = settings.getStartParameter();
+		return !startParameter.isNoBuildScan() && !containsPropertiesTask(startParameter);
+	}
+
+	private boolean containsPropertiesTask(StartParameter startParameter) {
+		for (String taskName : startParameter.getTaskNames()) {
+			if (taskName.equals("properties") || taskName.endsWith(":properties")) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	private void configureBuildScanConventions(DevelocityConfiguration develocity, BuildScanConfiguration buildScan,
 			StartParameter startParameter, File rootDir) {
-		if (startParameter.isNoBuildScan() || containsPropertiesTask(startParameter)) {
-			return;
-		}
 		ProcessOperationsProcessRunner processRunner = new ProcessOperationsProcessRunner(
 				new WorkingDirectoryProcessOperations(this.processOperations, rootDir));
 		if (startParameter.isBuildScan()) {
@@ -86,15 +124,6 @@ public class DevelocityConventionsPlugin implements Plugin<Settings> {
 
 			}.execute(new GradleConfigurableDevelocity(develocity), new GradleConfigurableBuildScan(buildScan));
 		}
-	}
-
-	private boolean containsPropertiesTask(StartParameter startParameter) {
-		for (String taskName : startParameter.getTaskNames()) {
-			if (taskName.equals("properties") || taskName.endsWith(":properties")) {
-				return true;
-			}
-		}
-		return false;
 	}
 
 }
