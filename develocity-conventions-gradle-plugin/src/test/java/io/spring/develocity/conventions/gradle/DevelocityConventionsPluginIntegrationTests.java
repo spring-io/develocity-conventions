@@ -47,7 +47,7 @@ class DevelocityConventionsPluginIntegrationTests {
 	@Test
 	void whenThePluginIsAppliedThenBuildScanConventionsAreApplied(@TempDir File projectDir) {
 		prepareProject(projectDir);
-		BuildResult result = build(projectDir, "6.0.1", "verifyBuildScanConfig");
+		BuildResult result = build(projectDir, "verifyBuildScanConfig");
 		assertThat(result.getOutput()).contains("Build scan server: https://ge.spring.io");
 		assertThat(result.getOutput()).contains("Capture task input files: true");
 	}
@@ -55,14 +55,14 @@ class DevelocityConventionsPluginIntegrationTests {
 	@Test
 	void whenThePluginIsAppliedThenBuildCacheConventionsAreApplied(@TempDir File projectDir) {
 		prepareProject(projectDir);
-		BuildResult result = build(projectDir, "6.0.1", "verifyBuildCacheConfig");
+		BuildResult result = build(projectDir, "verifyBuildCacheConfig");
 		assertThat(result.getOutput()).contains("Build cache server: https://ge.spring.io");
 	}
 
 	@Test
 	void whenThePluginIsAppliedAndBuildScansAreDisabledThenBuildScanConventionsAreNotApplied(@TempDir File projectDir) {
 		prepareProject(projectDir);
-		BuildResult result = build(projectDir, "6.0.1", "verifyBuildScanConfig", "--no-scan");
+		BuildResult result = build(projectDir, "verifyBuildScanConfig", "--no-scan");
 		assertThat(result.getOutput()).contains("Build scan server: null");
 		assertThat(result.getOutput()).contains("Capture task input files: false");
 	}
@@ -72,7 +72,7 @@ class DevelocityConventionsPluginIntegrationTests {
 			@TempDir File projectDir) {
 		prepareProject(projectDir);
 		write(new File(projectDir, "gradle.properties"), (writer) -> writer.println("spring.build-type=other"));
-		BuildResult result = build(projectDir, "6.0.1", "verifyBuildScanConfig");
+		BuildResult result = build(projectDir, "verifyBuildScanConfig");
 		assertThat(result.getOutput()).contains("Build scan server: null");
 		assertThat(result.getOutput()).contains("Capture task input files: false");
 	}
@@ -81,7 +81,7 @@ class DevelocityConventionsPluginIntegrationTests {
 	void whenThePluginIsAppliedAndTheSpringBuildTypeIsOssThenBuildScanConventionsAreApplied(@TempDir File projectDir) {
 		prepareProject(projectDir);
 		write(new File(projectDir, "gradle.properties"), (writer) -> writer.println("spring.build-type=oss"));
-		BuildResult result = build(projectDir, "6.0.1", "verifyBuildScanConfig");
+		BuildResult result = build(projectDir, "verifyBuildScanConfig");
 		assertThat(result.getOutput()).contains("Build scan server: https://ge.spring.io");
 		assertThat(result.getOutput()).contains("Capture task input files: true");
 	}
@@ -90,7 +90,7 @@ class DevelocityConventionsPluginIntegrationTests {
 	void whenThePluginIsAppliedAndPropertiesTaskIsExecutedThenBuildScanConventionsAreNotApplied(
 			@TempDir File projectDir) {
 		prepareProject(projectDir);
-		BuildResult result = build(projectDir, "6.0.1", "properties", "verifyBuildScanConfig", "--no-scan");
+		BuildResult result = build(projectDir, "properties", "verifyBuildScanConfig", "--no-scan");
 		assertThat(result.getOutput()).contains("Build scan server: null");
 		assertThat(result.getOutput()).contains("Capture task input files: false");
 	}
@@ -99,7 +99,7 @@ class DevelocityConventionsPluginIntegrationTests {
 	void givenMultiProjectBuildWhenThePluginIsAppliedAndPropertiesTaskIsExecutedThenBuildScanConventionsAreNotApplied(
 			@TempDir File projectDir) {
 		prepareMultiModuleProject(projectDir);
-		BuildResult result = build(projectDir, "6.0.1", "sub:properties", "sub:verifyBuildScanConfig", "--no-scan");
+		BuildResult result = build(projectDir, "sub:properties", "sub:verifyBuildScanConfig", "--no-scan");
 		assertThat(result.getOutput()).contains("Build scan server: null");
 		assertThat(result.getOutput()).contains("Capture task input files: false");
 	}
@@ -107,7 +107,7 @@ class DevelocityConventionsPluginIntegrationTests {
 	@Test
 	void whenThePluginIsAppliedAndScanIsSpecifiedThenServerIsNotCustomized(@TempDir File projectDir) {
 		prepareProject(projectDir);
-		BuildResult result = build(projectDir, "6.0.1", "verifyBuildScanConfig", "--scan");
+		BuildResult result = build(projectDir, "verifyBuildScanConfig", "--scan");
 		assertThat(result.getOutput()).contains("Build scan server: null");
 		assertThat(result.getOutput()).contains("Capture task input files: true");
 	}
@@ -115,7 +115,7 @@ class DevelocityConventionsPluginIntegrationTests {
 	@Test
 	void whenThePluginIsAppliedAndBuildCacheIsDisabledThenBuildCacheConventionsAreNotApplied(@TempDir File projectDir) {
 		prepareProject(projectDir);
-		BuildResult result = build(projectDir, "6.0.1", "verifyBuildCacheConfig", "--no-build-cache");
+		BuildResult result = build(projectDir, "verifyBuildCacheConfig", "--no-build-cache");
 		assertThat(result.getOutput()).contains("Build cache server: null");
 	}
 
@@ -124,7 +124,7 @@ class DevelocityConventionsPluginIntegrationTests {
 			@TempDir File projectDir) {
 		prepareProject(projectDir);
 		write(new File(projectDir, "gradle.properties"), (writer) -> writer.println("spring.build-type=other"));
-		BuildResult result = build(projectDir, "6.0.1", "verifyBuildCacheConfig");
+		BuildResult result = build(projectDir, "verifyBuildCacheConfig");
 		assertThat(result.getOutput()).contains("Build cache server: null");
 	}
 
@@ -132,7 +132,7 @@ class DevelocityConventionsPluginIntegrationTests {
 	void whenThePluginIsAppliedAndTheSpringBuildTypeIsOssThenBuildCacheConventionsAreApplied(@TempDir File projectDir) {
 		prepareProject(projectDir);
 		write(new File(projectDir, "gradle.properties"), (writer) -> writer.println("spring.build-type=oss"));
-		BuildResult result = build(projectDir, "6.0.1", "verifyBuildCacheConfig");
+		BuildResult result = build(projectDir, "verifyBuildCacheConfig");
 		assertThat(result.getOutput()).contains("Build cache server: https://ge.spring.io");
 	}
 
@@ -206,7 +206,7 @@ class DevelocityConventionsPluginIntegrationTests {
 		}
 	}
 
-	private BuildResult build(File projectDir, String gradleVersion, String... arguments) {
+	private BuildResult build(File projectDir, String... arguments) {
 		List<File> classpath = Arrays.asList(new File("bin/main"), new File("build/classes/java/main"),
 				new File("build/resources/main"),
 				new File(DevelocityPlugin.class.getProtectionDomain().getCodeSource().getLocation().getFile()),
@@ -214,7 +214,6 @@ class DevelocityConventionsPluginIntegrationTests {
 		List<String> augmentedArguments = new ArrayList<>(Arrays.asList(arguments));
 		augmentedArguments.add("--stacktrace");
 		return GradleRunner.create()
-			.withGradleVersion(gradleVersion)
 			.withProjectDir(projectDir)
 			.withPluginClasspath(classpath)
 			.withArguments(augmentedArguments)
