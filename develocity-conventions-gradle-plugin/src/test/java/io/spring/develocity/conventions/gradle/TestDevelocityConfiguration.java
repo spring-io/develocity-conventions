@@ -67,4 +67,9 @@ class TestDevelocityConfiguration implements DevelocityConfiguration {
 
 	}
 
+	@Override
+	public Property<Boolean> getEdgeDiscovery() {
+		throw new UnsupportedOperationException();
+	}
+
 }
