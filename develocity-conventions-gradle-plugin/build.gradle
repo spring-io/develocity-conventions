@@ -13,7 +13,7 @@ repositories {
 
 dependencies {
 	implementation(project(":develocity-conventions-core"))
-	implementation("com.gradle:develocity-gradle-plugin:3.19.2")
+	implementation("com.gradle:develocity-gradle-plugin:4.0.2")
 
 	testImplementation("org.assertj:assertj-core:3.27.2")
 	testImplementation("org.junit.jupiter:junit-jupiter:5.13.0")

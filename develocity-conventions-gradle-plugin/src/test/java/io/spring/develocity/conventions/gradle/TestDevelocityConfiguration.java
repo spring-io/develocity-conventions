@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2024 the original author or authors.
+ * Copyright 2020-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package io.spring.develocity.conventions.gradle;
 
 import com.gradle.develocity.agent.gradle.DevelocityConfiguration;
 import com.gradle.develocity.agent.gradle.buildcache.DevelocityBuildCache;
+import com.gradle.develocity.agent.gradle.integration.DevelocityIntegrationConfiguration;
 import com.gradle.develocity.agent.gradle.scan.BuildScanConfiguration;
 import org.gradle.api.Action;
 import org.gradle.api.provider.Property;
@@ -69,6 +70,11 @@ class TestDevelocityConfiguration implements DevelocityConfiguration {
 
 	@Override
 	public Property<Boolean> getEdgeDiscovery() {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public DevelocityIntegrationConfiguration getIntegration() {
 		throw new UnsupportedOperationException();
 	}
 

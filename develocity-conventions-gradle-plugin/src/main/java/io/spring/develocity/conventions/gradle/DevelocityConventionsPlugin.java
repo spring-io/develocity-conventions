@@ -35,6 +35,9 @@ import org.gradle.api.Plugin;
 import org.gradle.api.initialization.Settings;
 import org.gradle.api.internal.ProcessOperations;
 import org.gradle.api.provider.Provider;
+import org.gradle.util.GradleVersion;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link Plugin plugin} for configuring the use of Develocity hosted at
@@ -43,6 +46,8 @@ import org.gradle.api.provider.Provider;
  * @author Andy Wilkinson
  */
 public class DevelocityConventionsPlugin implements Plugin<Settings> {
+
+	private final Logger log = LoggerFactory.getLogger(DevelocityConventionsPlugin.class);
 
 	private final ProcessOperations processOperations;
 
@@ -53,6 +58,11 @@ public class DevelocityConventionsPlugin implements Plugin<Settings> {
 
 	@Override
 	public void apply(Settings settings) {
+		if (buildScanRequested(settings) && gradleVersionIsLessThanEightEight()) {
+			this.log.warn("Develocity conventions disabled. Using --scan requires Gradle 8.8 or later. "
+					+ "Current Gradle version is " + GradleVersion.current().getVersion());
+			return;
+		}
 		settings.getPlugins().apply(DevelocityPlugin.class);
 		DevelocityConfiguration extension = settings.getExtensions().getByType(DevelocityConfiguration.class);
 		if (!isOssBuild(settings)) {
@@ -67,6 +77,14 @@ public class DevelocityConventionsPlugin implements Plugin<Settings> {
 			settings.buildCache((buildCacheConfiguration) -> new BuildCacheConventions()
 				.execute(new GradleConfigurableBuildCache(extension.getBuildCache(), buildCacheConfiguration)));
 		}
+	}
+
+	private boolean buildScanRequested(Settings settings) {
+		return settings.getStartParameter().isBuildScan();
+	}
+
+	private boolean gradleVersionIsLessThanEightEight() {
+		return GradleVersion.version("8.8").compareTo(GradleVersion.current()) > 0;
 	}
 
 	private boolean isOssBuild(Settings settings) {

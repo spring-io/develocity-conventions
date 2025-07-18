@@ -56,6 +56,7 @@ To work around this, an environment variable named `BRANCH` can be set on the ta
 ### Anonymous publication
 
 When using Gradle, build scans can be published anonymously to scans.gradle.com by running the build with `--scan`.
+This requires Gradle 8.8 or later.
 
 ## Authentication
 

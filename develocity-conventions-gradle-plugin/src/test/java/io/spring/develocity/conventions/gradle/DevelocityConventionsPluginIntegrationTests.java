@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2024 the original author or authors.
+ * Copyright 2020-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,8 +48,8 @@ class DevelocityConventionsPluginIntegrationTests {
 	void whenThePluginIsAppliedThenBuildScanConventionsAreApplied(@TempDir File projectDir) {
 		prepareProject(projectDir);
 		BuildResult result = build(projectDir, "verifyBuildScanConfig");
-		assertThat(result.getOutput()).contains("Build scan server: https://ge.spring.io");
-		assertThat(result.getOutput()).contains("Capture task input files: true");
+		assertThat(result.getOutput()).contains("Develocity server: https://ge.spring.io");
+		assertThat(result.getOutput()).contains("Capture file fingerprints: true");
 	}
 
 	@Test
@@ -63,8 +63,8 @@ class DevelocityConventionsPluginIntegrationTests {
 	void whenThePluginIsAppliedAndBuildScansAreDisabledThenBuildScanConventionsAreNotApplied(@TempDir File projectDir) {
 		prepareProject(projectDir);
 		BuildResult result = build(projectDir, "verifyBuildScanConfig", "--no-scan");
-		assertThat(result.getOutput()).contains("Build scan server: null");
-		assertThat(result.getOutput()).contains("Capture task input files: false");
+		assertThat(result.getOutput()).contains("Develocity server: null");
+		assertThat(result.getOutput()).contains("Capture file fingerprints: false");
 	}
 
 	@Test
@@ -73,8 +73,8 @@ class DevelocityConventionsPluginIntegrationTests {
 		prepareProject(projectDir);
 		write(new File(projectDir, "gradle.properties"), (writer) -> writer.println("spring.build-type=other"));
 		BuildResult result = build(projectDir, "verifyBuildScanConfig");
-		assertThat(result.getOutput()).contains("Build scan server: null");
-		assertThat(result.getOutput()).contains("Capture task input files: false");
+		assertThat(result.getOutput()).contains("Develocity server: null");
+		assertThat(result.getOutput()).contains("Capture file fingerprints: false");
 	}
 
 	@Test
@@ -82,8 +82,8 @@ class DevelocityConventionsPluginIntegrationTests {
 		prepareProject(projectDir);
 		write(new File(projectDir, "gradle.properties"), (writer) -> writer.println("spring.build-type=oss"));
 		BuildResult result = build(projectDir, "verifyBuildScanConfig");
-		assertThat(result.getOutput()).contains("Build scan server: https://ge.spring.io");
-		assertThat(result.getOutput()).contains("Capture task input files: true");
+		assertThat(result.getOutput()).contains("Develocity server: https://ge.spring.io");
+		assertThat(result.getOutput()).contains("Capture file fingerprints: true");
 	}
 
 	@Test
@@ -91,8 +91,8 @@ class DevelocityConventionsPluginIntegrationTests {
 			@TempDir File projectDir) {
 		prepareProject(projectDir);
 		BuildResult result = build(projectDir, "properties", "verifyBuildScanConfig", "--no-scan");
-		assertThat(result.getOutput()).contains("Build scan server: null");
-		assertThat(result.getOutput()).contains("Capture task input files: false");
+		assertThat(result.getOutput()).contains("Develocity server: null");
+		assertThat(result.getOutput()).contains("Capture file fingerprints: false");
 	}
 
 	@Test
@@ -100,16 +100,26 @@ class DevelocityConventionsPluginIntegrationTests {
 			@TempDir File projectDir) {
 		prepareMultiModuleProject(projectDir);
 		BuildResult result = build(projectDir, "sub:properties", "sub:verifyBuildScanConfig", "--no-scan");
-		assertThat(result.getOutput()).contains("Build scan server: null");
-		assertThat(result.getOutput()).contains("Capture task input files: false");
+		assertThat(result.getOutput()).contains("Develocity server: null");
+		assertThat(result.getOutput()).contains("Capture file fingerprints: false");
 	}
 
 	@Test
-	void whenThePluginIsAppliedAndScanIsSpecifiedThenServerIsNotCustomized(@TempDir File projectDir) {
+	void whenThePluginIsAppliedAndScanIsSpecifiedItBacksOff(@TempDir File projectDir) {
 		prepareProject(projectDir);
-		BuildResult result = build(projectDir, "verifyBuildScanConfig", "--scan");
-		assertThat(result.getOutput()).contains("Build scan server: null");
-		assertThat(result.getOutput()).contains("Capture task input files: true");
+		BuildResult result = build(projectDir, "--scan");
+		assertThat(result.getOutput())
+			.contains("Develocity conventions disabled. Using --scan requires Gradle 8.8 or later. "
+					+ "Current Gradle version is 7.4.2");
+	}
+
+	@Test
+	void whenThePluginIsAppliedAndScanIsSpecifiedWithGradleEightEightServerIsNotCustomized(@TempDir File projectDir) {
+		prepareProject(projectDir);
+		BuildResult result = build(
+				prepareBuild(projectDir, "verifyBuildScanConfig", "--scan").withGradleVersion("8.8"));
+		assertThat(result.getOutput()).contains("Develocity server: null");
+		assertThat(result.getOutput()).contains("Capture file fingerprints: true");
 	}
 
 	@Test
@@ -147,8 +157,9 @@ class DevelocityConventionsPluginIntegrationTests {
 		write(new File(projectDir, "build.gradle"), (writer) -> {
 			writer.println("task verifyBuildScanConfig {");
 			writer.println("    doFirst {");
-			writer.println("        println \"Build scan server: ${buildScan.server}\"");
-			writer.println("        println \"Capture task input files: ${buildScan.captureTaskInputFiles}\"");
+			writer.println("        println \"Develocity server: ${develocity.server.getOrElse(null)}\"");
+			writer.println("    	def fileFingerprints = develocity.buildScan.capture.fileFingerprints");
+			writer.println("        println \"Capture file fingerprints: ${fileFingerprints.getOrElse(false)}\"");
 			writer.println("    }");
 			writer.println("}");
 			writer.println("task verifyBuildCacheConfig {");
@@ -172,8 +183,9 @@ class DevelocityConventionsPluginIntegrationTests {
 		write(new File(new File(projectDir, "sub"), "build.gradle"), (writer) -> {
 			writer.println("task verifyBuildScanConfig {");
 			writer.println("    doFirst {");
-			writer.println("        println \"Build scan server: ${buildScan.server}\"");
-			writer.println("        println \"Capture task input files: ${buildScan.captureTaskInputFiles}\"");
+			writer.println("        println \"Develocity server: ${develocity.server.getOrElse(null)}\"");
+			writer.println("    	def fileFingerprints = develocity.buildScan.capture.fileFingerprints");
+			writer.println("        println \"Capture file fingerprints: ${fileFingerprints.getOrElse(false)}\"");
 			writer.println("    }");
 			writer.println("}");
 			writer.println("task verifyBuildCacheConfig {");
@@ -207,6 +219,10 @@ class DevelocityConventionsPluginIntegrationTests {
 	}
 
 	private BuildResult build(File projectDir, String... arguments) {
+		return build(prepareBuild(projectDir, arguments));
+	}
+
+	private GradleRunner prepareBuild(File projectDir, String... arguments) {
 		List<File> classpath = Arrays.asList(new File("bin/main"), new File("build/classes/java/main"),
 				new File("build/resources/main"),
 				new File(DevelocityPlugin.class.getProtectionDomain().getCodeSource().getLocation().getFile()),
@@ -216,8 +232,11 @@ class DevelocityConventionsPluginIntegrationTests {
 		return GradleRunner.create()
 			.withProjectDir(projectDir)
 			.withPluginClasspath(classpath)
-			.withArguments(augmentedArguments)
-			.build();
+			.withArguments(augmentedArguments);
+	}
+
+	private BuildResult build(GradleRunner runner) {
+		return runner.build();
 	}
 
 }
