@@ -28,7 +28,7 @@ The build scans will be customized to:
 - Add tags:
     - `JDK-<version>`.
       When using Maven, `<version>` is the specification version of the JDK running the build.
-      When using Gradle, `<version>` is the value of the `toolchainVersion` project property or, when not set, it's the specification version of the JDK running the build.
+      When using Gradle, `<version>` is the value of the `toolchainVersion` property or, when not set, it's the specification version of the JDK running the build.
     - `CI` or `Local` depending on where the build is executing.
     - `dirty` if the git working copy is dirty.
     - Name of the git branch being built.

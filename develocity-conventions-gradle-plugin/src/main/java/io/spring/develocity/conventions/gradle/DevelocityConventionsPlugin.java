@@ -34,6 +34,7 @@ import org.gradle.StartParameter;
 import org.gradle.api.Plugin;
 import org.gradle.api.initialization.Settings;
 import org.gradle.api.internal.ProcessOperations;
+import org.gradle.api.provider.Provider;
 
 /**
  * {@link Plugin plugin} for configuring the use of Develocity hosted at
@@ -60,8 +61,7 @@ public class DevelocityConventionsPlugin implements Plugin<Settings> {
 			return;
 		}
 		if (isBuildScanEnabled(settings)) {
-			configureBuildScanConventions(extension, extension.getBuildScan(), settings.getStartParameter(),
-					settings.getRootDir());
+			configureBuildScanConventions(extension, extension.getBuildScan(), settings);
 		}
 		if (settings.getStartParameter().isBuildCacheEnabled()) {
 			settings.buildCache((buildCacheConfiguration) -> new BuildCacheConventions()
@@ -99,16 +99,16 @@ public class DevelocityConventionsPlugin implements Plugin<Settings> {
 	}
 
 	private void configureBuildScanConventions(DevelocityConfiguration develocity, BuildScanConfiguration buildScan,
-			StartParameter startParameter, File rootDir) {
+			Settings settings) {
+		Provider<String> toolchainVersion = settings.getProviders().gradleProperty("toolchainVersion");
 		ProcessOperationsProcessRunner processRunner = new ProcessOperationsProcessRunner(
-				new WorkingDirectoryProcessOperations(this.processOperations, rootDir));
-		if (startParameter.isBuildScan()) {
+				new WorkingDirectoryProcessOperations(this.processOperations, settings.getRootDir()));
+		if (settings.getStartParameter().isBuildScan()) {
 			new AnonymousPublicationBuildScanConventions(processRunner) {
 
 				@Override
 				protected String getJdkVersion() {
-					String toolchainVersion = startParameter.getProjectProperties().get("toolchainVersion");
-					return (toolchainVersion != null) ? toolchainVersion : super.getJdkVersion();
+					return toolchainVersion.getOrElse(super.getJdkVersion());
 				}
 
 			}.execute(new GradleConfigurableDevelocity(develocity), new GradleConfigurableBuildScan(buildScan));
@@ -118,8 +118,7 @@ public class DevelocityConventionsPlugin implements Plugin<Settings> {
 
 				@Override
 				protected String getJdkVersion() {
-					String toolchainVersion = startParameter.getProjectProperties().get("toolchainVersion");
-					return (toolchainVersion != null) ? toolchainVersion : super.getJdkVersion();
+					return toolchainVersion.getOrElse(super.getJdkVersion());
 				}
 
 			}.execute(new GradleConfigurableDevelocity(develocity), new GradleConfigurableBuildScan(buildScan));
