@@ -70,16 +70,10 @@ jobs:
       - name: Download release artifacts
         run: jf rt download --spec .github/release-artifacts.spec --spec-vars 'buildName=${{ format('develocity-conventions-{0}', needs.get-version.outputs.version) }};buildNumber=${{ github.run_number }}'
       - name: Sync
-        uses: spring-io/nexus-sync-action@42477a2230a2f694f9eaa4643fa9e76b99b7ab84 # v0.0.1
+        uses: spring-io/central-publish-action@0cdd90d12e6876341e82860d951e1bcddc1e51b6 # v0.2.0
         with:
-          username: ${{ secrets.OSSRH_S01_TOKEN_USERNAME }}
-          password: ${{ secrets.OSSRH_S01_TOKEN_PASSWORD }}
-          staging-profile-name: ${{ secrets.OSSRH_S01_STAGING_PROFILE_NAME }}
-          create: true
-          upload: true
-          close: true
-          release: true
-          generate-checksums: true
+          token: ${{ secrets.CENTRAL_TOKEN_PASSWORD }}
+          token-name: ${{ secrets.CENTRAL_TOKEN_USERNAME }}
       - name: Await
         shell: bash
         run: |
