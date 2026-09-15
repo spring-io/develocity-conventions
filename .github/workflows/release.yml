@@ -26,14 +26,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Set up Java
-        uses: actions/setup-java@99b8673ff64fbf99d8d325f52d9a5bdedb8483e9 # v4.2.1
+        uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
         with:
           distribution: 'liberica'
           java-version: 8
       - name: Check out code
-        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@417ae3ccd767c252f5661f1ace9f835f9654f2b5 # v3.1.0
+        uses: gradle/actions/setup-gradle@9c971963bec38e04b3d30dcc455b5382be2fdbfb # v6.3.0
+        with:
+          cache-provider: basic
       - name: Configure Gradle properties
         shell: bash
         run: |
@@ -44,7 +46,7 @@ jobs:
         id: build
         run: ./gradlew -PdistributionRepository=$(pwd)/deployment-repository build publishAllPublicationsToDeploymentRepository
       - name: Stage
-        uses: spring-io/artifactory-deploy-action@26bbe925a75f4f863e1e529e85be2d0093cac116 # v0.0.1
+        uses: spring-io/artifactory-deploy-action@aba148f1541e09adcf5735af90029fac9a6d3083 # v0.0.5
         with:
           uri: 'https://repo.spring.io'
           username: ${{ secrets.ARTIFACTORY_USERNAME }}
@@ -62,29 +64,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out code
-        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Set up JFrog CLI
-        uses: jfrog/setup-jfrog-cli@d82fe26823e1f25529250895d5673f65b02af085 # v4.0.1
+        uses: jfrog/setup-jfrog-cli@deda456d982fc5e9a7a020b63eb0d2968aedd33e # v5.1.0
         env:
           JF_ENV_SPRING: ${{ secrets.JF_ARTIFACTORY_SPRING }}
       - name: Download release artifacts
         run: jf rt download --spec .github/release-artifacts.spec --spec-vars 'buildName=${{ format('develocity-conventions-{0}', needs.get-version.outputs.version) }};buildNumber=${{ github.run_number }}'
       - name: Sync
-        uses: spring-io/central-publish-action@0cdd90d12e6876341e82860d951e1bcddc1e51b6 # v0.2.0
+        uses: spring-io/central-publish-action@5ea05c77127404d89c374ac4cd17b6ec6b0e7293 # v0.4.0
         with:
           token: ${{ secrets.CENTRAL_TOKEN_PASSWORD }}
           token-name: ${{ secrets.CENTRAL_TOKEN_USERNAME }}
-      - name: Await
-        shell: bash
-        run: |
-          url=${{ format('https://repo.maven.apache.org/maven2/io/spring/develocity/conventions/develocity-conventions-core/{0}/develocity-conventions-core-{0}.jar', needs.get-version.outputs.version) }}
-          echo "Waiting for $url"
-          until curl --fail --head --silent $url > /dev/null
-          do
-            echo "."
-            sleep 60
-          done
-          echo "$url is available"
   promote-release:
     name: Promote release
     needs:
@@ -94,7 +85,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Set up JFrog CLI
-        uses: jfrog/setup-jfrog-cli@d82fe26823e1f25529250895d5673f65b02af085 # v4.0.1
+        uses: jfrog/setup-jfrog-cli@deda456d982fc5e9a7a020b63eb0d2968aedd33e # v5.1.0
         env:
           JF_ENV_SPRING: ${{ secrets.JF_ARTIFACTORY_SPRING }}
       - name: Promote build
@@ -107,7 +98,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Generate changelog
-        uses: spring-io/github-changelog-generator@052892c62af51f8af87a9da6de55e70864b7df12
+        uses: spring-io/github-changelog-generator@f7d7a87a3e7c627ecb8c26cf086c38ac5a939721 # 0.0.14
         with:
           milestone: ${{ needs.get-version.outputs.version }}
           token: ${{ secrets.GH_ACTIONS_REPO_TOKEN }}
